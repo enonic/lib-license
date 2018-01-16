@@ -1,0 +1,31 @@
+plugins {
+    id 'java'
+    id 'jacoco'
+    id 'maven'
+    id 'com.enonic.defaults' version '1.0.3'
+    id 'com.enonic.xp.doc' version '1.0.7'
+}
+
+repositories {
+    jcenter()
+    xp.enonicRepo()
+}
+
+dependencies {
+    compile 'com.google.guava:guava:18.0'
+    testCompile 'junit:junit:4.12'
+    testCompile "com.enonic.xp:testing:${xpVersion}"
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled = true
+        html.enabled = true
+    }
+}
+
+check.dependsOn jacocoTestReport
+
+artifacts {
+    archives jar
+}
