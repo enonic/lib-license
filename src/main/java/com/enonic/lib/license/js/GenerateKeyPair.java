@@ -12,7 +12,7 @@ public final class GenerateKeyPair
 {
     private LicenseManager licenseManager;
 
-    public KeyPairMapper generateKeyPair()
+    public KeyPairMapper generate()
         throws GeneralSecurityException
     {
         final KeyPair keyPair = licenseManager.generateKeyPair();

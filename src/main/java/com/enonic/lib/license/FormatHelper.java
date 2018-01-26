@@ -1,8 +1,14 @@
 package com.enonic.lib.license;
 
-final class Hex
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import com.google.common.base.Splitter;
+
+final class FormatHelper
 {
-    private Hex()
+    private FormatHelper()
     {
     }
 
@@ -35,5 +41,15 @@ final class Hex
             hexChars[( j - from ) * 2 + 1] = hexArray[v & 0x0F];
         }
         return new String( hexChars );
+    }
+
+    public static String asPEM( final String value, final String label )
+    {
+        final String header = "-----BEGIN " + label + "-----";
+        final String footer = "-----END " + label + "-----";
+        final List<String> lines = new ArrayList<>( Splitter.fixedLength( 64 ).splitToList( value ) );
+        lines.add( 0, header );
+        lines.add( footer );
+        return lines.stream().collect( Collectors.joining( "\r\n" ) );
     }
 }

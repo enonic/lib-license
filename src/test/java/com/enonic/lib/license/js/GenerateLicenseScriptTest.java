@@ -4,7 +4,7 @@ import com.enonic.lib.license.LicenseManager;
 import com.enonic.lib.license.LicenseManagerImpl;
 import com.enonic.xp.testing.ScriptRunnerSupport;
 
-public class GenerateKeyPairScriptTest
+public class GenerateLicenseScriptTest
     extends ScriptRunnerSupport
 {
 
@@ -21,7 +21,7 @@ public class GenerateKeyPairScriptTest
     @Override
     public String getScriptTestFile()
     {
-        return "/test/generatekeypair-test.js";
+        return "/test/generatelicense-test.js";
     }
 
 }

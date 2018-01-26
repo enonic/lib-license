@@ -6,4 +6,7 @@ public interface LicenseManager
 {
     KeyPair generateKeyPair()
         throws GeneralSecurityException;
+
+    String generateLicense( PrivateKey privateKey, LicenseDetails license )
+        throws GeneralSecurityException;
 }

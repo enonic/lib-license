@@ -8,7 +8,5 @@ exports.testGenerateKeyPair = function () {
 
     testing.assertNotNull(keyPair.privateKey);
     testing.assertNotNull(keyPair.publicKey);
-    testing.assertNotNull(keyPair.privateKeyBytes);
-    testing.assertNotNull(keyPair.publicKeyBytes);
 
 };

@@ -2,8 +2,6 @@ package com.enonic.lib.license;
 
 import org.junit.Test;
 
-import com.enonic.lib.license.internal.LicenseManagerImpl;
-
 import static org.junit.Assert.*;
 
 public class LicenseManagerImplTest
@@ -19,8 +17,6 @@ public class LicenseManagerImplTest
         assertNotNull( keyPair );
         assertNotNull( keyPair.getPrivateKey() );
         assertNotNull( keyPair.getPublicKey() );
-
-        System.out.println( keyPair );
     }
 
     @Test
@@ -30,9 +26,9 @@ public class LicenseManagerImplTest
         final LicenseManagerImpl licMan = new LicenseManagerImpl();
         final KeyPair keyPair = licMan.generateKeyPair();
 
-        final License license = new License( "name" );
-        final String signature = licMan.generateLicense( license, keyPair.getPrivateKey() );
-        final boolean valid = licMan.validateLicense( license, signature, keyPair.getPublicKey() );
-        assertTrue( valid );
+        final LicenseDetails licenseDetails = LicenseDetails.create().name( "name" ).organization( "org" ).build();
+        final String license = licMan.generateLicense( keyPair.getPrivateKey(), licenseDetails );
+
+        assertNotNull( license );
     }
 }

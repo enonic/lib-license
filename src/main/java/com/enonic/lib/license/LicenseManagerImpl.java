@@ -1,4 +1,4 @@
-package com.enonic.lib.license.internal;
+package com.enonic.lib.license;
 
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
@@ -12,15 +12,13 @@ import javax.crypto.Cipher;
 
 import org.osgi.service.component.annotations.Component;
 
-import com.enonic.lib.license.KeyPair;
-import com.enonic.lib.license.License;
-import com.enonic.lib.license.LicenseManager;
-
 @Component(immediate = true)
 public final class LicenseManagerImpl
     implements LicenseManager
 {
-    private static final int KEY_SIZE = 2048;
+    static final int KEY_SIZE = 2048;
+
+    private static final String LICENSE_HEADER = "LICENSE";
 
     @Override
     public KeyPair generateKeyPair()
@@ -32,16 +30,17 @@ public final class LicenseManagerImpl
         return new KeyPair( rsaKeyPair );
     }
 
-    public String generateLicense( final License license, final com.enonic.lib.license.PrivateKey privateKey )
+    public String generateLicense( final com.enonic.lib.license.PrivateKey privateKey, final LicenseDetails license )
         throws GeneralSecurityException
     {
-        final String plainText = license.toString();
-        final String signature = sign( plainText, privateKey.getRsaKey() );
-        System.out.println( signature );
-        return signature;
+        String licenseData = LicenseDetailsSerializer.serialize( license );
+        licenseData = Base64.getEncoder().withoutPadding().encodeToString( licenseData.getBytes( StandardCharsets.UTF_8 ) );
+
+        final String signature = sign( licenseData, privateKey.getRsaKey() );
+        return FormatHelper.asPEM( licenseData + "." + signature, LICENSE_HEADER );
     }
 
-    public boolean validateLicense( final License license, String signature, final com.enonic.lib.license.PublicKey publicKey )
+    public boolean validateLicense( final LicenseDetails license, String signature, final com.enonic.lib.license.PublicKey publicKey )
         throws GeneralSecurityException
     {
         final String plainText = license.toString();
@@ -53,13 +52,12 @@ public final class LicenseManagerImpl
     private String sign( String plainText, PrivateKey privateKey )
         throws GeneralSecurityException
     {
-        Signature privateSignature = Signature.getInstance( "SHA256withRSA" );
+        final Signature privateSignature = Signature.getInstance( "SHA256withRSA" );
         privateSignature.initSign( privateKey );
         privateSignature.update( plainText.getBytes( StandardCharsets.UTF_8 ) );
 
-        byte[] signature = privateSignature.sign();
-
-        return Base64.getEncoder().encodeToString( signature );
+        final byte[] signature = privateSignature.sign();
+        return Base64.getEncoder().withoutPadding().encodeToString( signature );
     }
 
     private boolean verify( String plainText, String signature, PublicKey publicKey )
