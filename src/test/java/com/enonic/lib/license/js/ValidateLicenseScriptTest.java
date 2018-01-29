@@ -5,7 +5,7 @@ import com.enonic.lib.license.LicenseManagerImpl;
 import com.enonic.xp.resource.ResourceKey;
 import com.enonic.xp.testing.ScriptRunnerSupport;
 
-public class GenerateLicenseScriptTest
+public class ValidateLicenseScriptTest
     extends ScriptRunnerSupport
 {
 
@@ -22,7 +22,7 @@ public class GenerateLicenseScriptTest
     @Override
     public String getScriptTestFile()
     {
-        return "/test/generatelicense-test.js";
+        return "/test/validatelicense-test.js";
     }
 
     public String load( final ResourceKey resource )

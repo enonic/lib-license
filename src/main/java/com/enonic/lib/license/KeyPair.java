@@ -95,6 +95,10 @@ public final class KeyPair
         final String footer = lines.get( lines.size() - 1 );
         lines.remove( 0 );
         lines.remove( lines.size() - 1 );
+        if ( !FormatHelper.isPEMHeader( header, KEY_PAIR_HEADER ) || !FormatHelper.isPEMFooter( footer, KEY_PAIR_HEADER ) )
+        {
+            return null;
+        }
 
         final String keyPairStr = lines.stream().collect( Collectors.joining( "" ) );
         final int p = keyPairStr.indexOf( '.' );

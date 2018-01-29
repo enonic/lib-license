@@ -31,4 +31,18 @@ public class LicenseManagerImplTest
 
         assertNotNull( license );
     }
+
+    @Test
+    public void validateLicense()
+        throws Exception
+    {
+        final LicenseManagerImpl licMan = new LicenseManagerImpl();
+        final KeyPair keyPair = licMan.generateKeyPair();
+        final LicenseDetails licenseDetails = LicenseDetails.create().name( "name" ).organization( "org" ).build();
+        final String license = licMan.generateLicense( keyPair.getPrivateKey(), licenseDetails );
+
+        final LicenseDetails validLicense = licMan.validateLicense( keyPair.getPublicKey(), license );
+
+        assertNotNull( validLicense );
+    }
 }

@@ -45,11 +45,31 @@ final class FormatHelper
 
     public static String asPEM( final String value, final String label )
     {
-        final String header = "-----BEGIN " + label + "-----";
-        final String footer = "-----END " + label + "-----";
+        final String header = header( label );
+        final String footer = footer( label );
         final List<String> lines = new ArrayList<>( Splitter.fixedLength( 64 ).splitToList( value ) );
         lines.add( 0, header );
         lines.add( footer );
         return lines.stream().collect( Collectors.joining( "\r\n" ) );
+    }
+
+    public static boolean isPEMHeader( final String line, final String label )
+    {
+        return header( label ).equalsIgnoreCase( line );
+    }
+
+    public static boolean isPEMFooter( final String line, final String label )
+    {
+        return footer( label ).equalsIgnoreCase( line );
+    }
+
+    private static String header( final String label )
+    {
+        return "-----BEGIN " + label + "-----";
+    }
+
+    private static String footer( final String label )
+    {
+        return "-----END " + label + "-----";
     }
 }

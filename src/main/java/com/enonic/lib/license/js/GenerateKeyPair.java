@@ -1,7 +1,5 @@
 package com.enonic.lib.license.js;
 
-import java.security.GeneralSecurityException;
-
 import com.enonic.lib.license.KeyPair;
 import com.enonic.lib.license.LicenseManager;
 import com.enonic.xp.script.bean.BeanContext;
@@ -13,7 +11,6 @@ public final class GenerateKeyPair
     private LicenseManager licenseManager;
 
     public KeyPairMapper generate()
-        throws GeneralSecurityException
     {
         final KeyPair keyPair = licenseManager.generateKeyPair();
         return new KeyPairMapper( keyPair );

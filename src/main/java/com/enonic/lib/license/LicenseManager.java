@@ -1,12 +1,10 @@
 package com.enonic.lib.license;
 
-import java.security.GeneralSecurityException;
-
 public interface LicenseManager
 {
-    KeyPair generateKeyPair()
-        throws GeneralSecurityException;
+    KeyPair generateKeyPair();
 
-    String generateLicense( PrivateKey privateKey, LicenseDetails license )
-        throws GeneralSecurityException;
+    String generateLicense( PrivateKey privateKey, LicenseDetails license );
+
+    LicenseDetails validateLicense( PublicKey publicKey, String license );
 }

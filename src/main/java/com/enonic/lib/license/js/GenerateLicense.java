@@ -1,7 +1,5 @@
 package com.enonic.lib.license.js;
 
-import java.security.GeneralSecurityException;
-
 import com.enonic.lib.license.LicenseDetails;
 import com.enonic.lib.license.LicenseManager;
 import com.enonic.lib.license.PrivateKey;
@@ -20,7 +18,6 @@ public final class GenerateLicense
     private String privateKey;
 
     public String generate()
-        throws GeneralSecurityException
     {
         final PrivateKey privateKey = PrivateKey.from( this.privateKey );
         if ( privateKey == null )
