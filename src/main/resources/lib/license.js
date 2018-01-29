@@ -2,6 +2,16 @@
  * Functions for license generation and validation.
  */
 
+function KeyPair(keyPair) {
+    this.privateKey = keyPair.privateKey;
+    this.publicKey = keyPair.publicKey;
+    this._string = keyPair.string;
+}
+
+KeyPair.prototype.toString = function () {
+    return this._string;
+};
+
 /**
  * Generate a public/private key pair to be used for license generation and validation.
  *
@@ -10,6 +20,19 @@
 exports.generateKeyPair = function () {
     var bean = __.newBean('com.enonic.lib.license.js.GenerateKeyPair');
     var keyPairObj = bean.generate();
+    var keyPair = __.toNativeObject(keyPairObj);
+    return new KeyPair(keyPair);
+};
+
+/**
+ * Load a key pair from a string and returns it as an object.
+ *
+ * @param {string} keyPairString Key key.
+ * @returns {Object|null} Returns an object with a new key pair, or null if the input is not valid.
+ */
+exports.loadKeyPair = function (keyPairString) {
+    var bean = __.newBean('com.enonic.lib.license.js.GenerateKeyPair');
+    var keyPairObj = bean.load(keyPairString);
     return __.toNativeObject(keyPairObj);
 };
 
@@ -38,6 +61,7 @@ exports.generateLicense = function (privateKey, license) {
 
 /**
  * Validates a license using the public-key, and returns the license details.
+ *
  * @param {string} license Encoded license string.
  * @param {string} [publicKey] Public key.
  * @returns {object|null} License details object, or null if the license is not valid.

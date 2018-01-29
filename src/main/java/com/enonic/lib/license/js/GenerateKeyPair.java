@@ -16,6 +16,12 @@ public final class GenerateKeyPair
         return new KeyPairMapper( keyPair );
     }
 
+    public KeyPairMapper load( String value )
+    {
+        final KeyPair keyPair = KeyPair.from( value );
+        return keyPair != null ? new KeyPairMapper( keyPair ) : null;
+    }
+
     @Override
     public void initialize( final BeanContext context )
     {

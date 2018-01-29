@@ -20,6 +20,7 @@ public final class KeyPairMapper
     {
         gen.value( "privateKey", keyPair.getPrivateKey().serialize() );
         gen.value( "publicKey", keyPair.getPublicKey().serialize() );
+        gen.value( "string", keyPair.serialize() );
     }
 
 }
