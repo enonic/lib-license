@@ -12,5 +12,5 @@ exports.testGenerateKeyPair = function () {
     testing.assertNotNull(licenseDetails);
     testing.assertEquals('name', licenseDetails.name);
     testing.assertEquals('org', licenseDetails.organization);
-
+    print(JSON.stringify(licenseDetails, null, 2));
 };

@@ -43,6 +43,9 @@ exports.loadKeyPair = function (keyPairString) {
  * @param {object} license JSON with the parameters.
  * @param {string} license.name Name.
  * @param {string} license.organization Organization.
+ * @param {string|Date} [license.issueTime] Time when the license was issued.
+ * @param {string|Date} [license.expiryTime] Expiration time for the license.
+ * @param {object} [license.properties] Custom key-value properties.
  * @returns {object} License object.
  */
 exports.generateLicense = function (privateKey, license) {
@@ -54,6 +57,9 @@ exports.generateLicense = function (privateKey, license) {
     var bean = __.newBean('com.enonic.lib.license.js.GenerateLicense');
     bean.name = license.name;
     bean.organization = license.organization;
+    bean.issueTime = license.issueTime;
+    bean.expiryTime = license.expiryTime;
+    bean.properties = license.properties || {};
     bean.privateKey = privateKey;
 
     return __.toNativeObject(bean.generate());

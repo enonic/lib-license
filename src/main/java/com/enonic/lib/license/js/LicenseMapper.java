@@ -20,6 +20,11 @@ public final class LicenseMapper
     {
         gen.value( "name", license.getName() );
         gen.value( "organization", license.getOrganization() );
+        gen.value( "expiryTime", license.getExpiryTime() );
+        gen.value( "issueTime", license.getIssueTime() );
+        gen.map( "data" );
+        license.getProperties().forEach( gen::value );
+        gen.end();
     }
 
 }
