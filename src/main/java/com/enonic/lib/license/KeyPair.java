@@ -106,8 +106,8 @@ public final class KeyPair
         {
             return null;
         }
-        final String priv = keyPairStr.substring( 0, p );
-        final String pub = keyPairStr.substring( p + 1 );
+        final String priv = keyPairStr.substring( 0, p ).trim();
+        final String pub = keyPairStr.substring( p + 1 ).trim();
 
         final PrivateKey privateKey = PrivateKey.from( priv );
         final PublicKey publicKey = PublicKey.from( pub );

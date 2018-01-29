@@ -34,7 +34,7 @@ public final class PublicKey
         }
         try
         {
-            final byte[] keyBytes = Base64.getUrlDecoder().decode( value );
+            final byte[] keyBytes = Base64.getUrlDecoder().decode( value.trim() );
             java.security.PublicKey publicKey = KeyFactory.getInstance( "RSA" ).generatePublic( new X509EncodedKeySpec( keyBytes ) );
             return new PublicKey( publicKey );
         }

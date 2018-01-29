@@ -34,7 +34,7 @@ public final class PrivateKey
         }
         try
         {
-            final byte[] keyBytes = Base64.getUrlDecoder().decode( value );
+            final byte[] keyBytes = Base64.getUrlDecoder().decode( value.trim() );
             java.security.PrivateKey privateKey = KeyFactory.getInstance( "RSA" ).generatePrivate( new PKCS8EncodedKeySpec( keyBytes ) );
             return new PrivateKey( privateKey );
         }

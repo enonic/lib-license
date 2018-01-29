@@ -64,25 +64,24 @@ exports.generateLicense = function (privateKey, license) {
 
     return __.toNativeObject(bean.generate());
 };
-
+// TODO params by name to specify appkey
 /**
  * Validates a license using the public-key, and returns the license details.
  *
- * @param {string} license Encoded license string.
- * @param {string} [publicKey] Public key.
+ * @param {string} [license] Encoded license string. Optional, if not set it will look for it in XP_HOME/license.
+ * @param {string} [publicKey] Public key. Optional, if not set it will look for it in the current app.
  * @returns {object|null} License details object, or null if the license is not valid.
  */
 exports.validateLicense = function (license, publicKey) {
-    if (license === undefined) {
-        throw "Parameter 'license' is required";
-    }
-    if (publicKey === undefined) {
-        throw "Parameter 'publicKey' is required";
-    }
-
     var bean = __.newBean('com.enonic.lib.license.js.ValidateLicense');
-    bean.license = license;
-    bean.publicKey = publicKey;
+    bean.license = __.nullOrValue(license);
+    bean.publicKey = __.nullOrValue(publicKey);
+    if (license == null) {
+        bean.app = __.nullOrValue(app.name);
+    }
+    if (publicKey == null) {
+        bean.publicKeyResource = __.nullOrValue(resolve('/license.key'));
+    }
 
     return __.toNativeObject(bean.validate());
 };
