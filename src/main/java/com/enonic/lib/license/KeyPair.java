@@ -112,6 +112,11 @@ public final class KeyPair
         final PrivateKey privateKey = PrivateKey.from( priv );
         final PublicKey publicKey = PublicKey.from( pub );
 
+        if ( privateKey == null || publicKey == null )
+        {
+            return null;
+        }
+
         return new KeyPair( publicKey, privateKey );
     }
 }
