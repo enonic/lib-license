@@ -123,7 +123,7 @@ public final class LicenseManagerImpl
         }
         catch ( GeneralSecurityException e )
         {
-            throw new RuntimeException( e );
+            return false;
         }
     }
 
