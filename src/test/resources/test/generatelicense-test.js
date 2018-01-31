@@ -7,8 +7,8 @@ exports.testGenerateLicense = function () {
     var privateKey = testInstance.load(resolve('generate_private_key.txt'));
 
     var license = licenseLib.generateLicense(privateKey, {
-        name: 'name',
-        organization: 'org',
+        issuedBy: 'issuedBy',
+        issuedTo: 'issuedTo',
         issueTime: '2018-01-29T11:22:00Z',
         expiryTime: new Date('2058-01-29T11:22:00Z'),
         properties: {

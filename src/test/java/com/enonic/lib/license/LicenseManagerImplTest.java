@@ -29,7 +29,7 @@ public class LicenseManagerImplTest
         final LicenseManagerImpl licMan = new LicenseManagerImpl();
         final KeyPair keyPair = licMan.generateKeyPair();
 
-        final LicenseDetails licenseDetails = LicenseDetails.create().name( "name" ).organization( "org" ).build();
+        final LicenseDetails licenseDetails = LicenseDetails.create().issuedTo( "name" ).issuedBy( "org" ).build();
         final String license = licMan.generateLicense( keyPair.getPrivateKey(), licenseDetails );
 
         assertNotNull( license );
@@ -41,7 +41,7 @@ public class LicenseManagerImplTest
     {
         final LicenseManagerImpl licMan = new LicenseManagerImpl();
         final KeyPair keyPair = licMan.generateKeyPair();
-        final LicenseDetails licenseDetails = LicenseDetails.create().name( "name" ).organization( "org" ).build();
+        final LicenseDetails licenseDetails = LicenseDetails.create().issuedTo( "name" ).issuedBy( "org" ).build();
         final String license = licMan.generateLicense( keyPair.getPrivateKey(), licenseDetails );
 
         final LicenseDetails validLicense = licMan.validateLicense( keyPair.getPublicKey(), license );
@@ -56,8 +56,8 @@ public class LicenseManagerImplTest
         final LicenseManagerImpl licMan = new LicenseManagerImpl();
         final KeyPair keyPair = licMan.generateKeyPair();
         final LicenseDetails licenseDetails = LicenseDetails.create().
-            name( "name" ).
-            organization( "org" ).
+            issuedTo( "name" ).
+            issuedBy( "org" ).
             issueTime( Instant.now() ).
             expiryTime( Instant.now().minus( 10, ChronoUnit.MINUTES ) ).
             build();

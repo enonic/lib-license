@@ -19,16 +19,16 @@ public class LicenseDetailsTest
     public void testEquals()
     {
         final LicenseDetails lic1 = LicenseDetails.create().
-            name( "name" ).
-            organization( "organization" ).
+            issuedTo( "name" ).
+            issuedBy( "organization" ).
             expiryTime( TIME1 ).
             issueTime( TIME2 ).
             property( "key1", "value1" ).
             property( "key2", "value2" ).
             build();
         final LicenseDetails lic2 = LicenseDetails.create().
-            name( "name" ).
-            organization( "organization" ).
+            issuedTo( "name" ).
+            issuedBy( "organization" ).
             expiryTime( TIME1 ).
             issueTime( TIME2 ).
             property( "key1", "value1" ).
@@ -46,8 +46,8 @@ public class LicenseDetailsTest
     public void testCopy()
     {
         final LicenseDetails lic1 = LicenseDetails.create().
-            name( "name" ).
-            organization( "organization" ).
+            issuedTo( "name" ).
+            issuedBy( "organization" ).
             expiryTime( TIME1 ).
             issueTime( TIME2 ).
             property( "key1", "value1" ).
@@ -67,15 +67,15 @@ public class LicenseDetailsTest
         props.put( "key2", "value2" );
 
         final LicenseDetails lic1 = LicenseDetails.create().
-            name( "name" ).
-            organization( "organization" ).
+            issuedTo( "name" ).
+            issuedBy( "organization" ).
             expiryTime( TIME1 ).
             issueTime( TIME2 ).
             properties( props ).
             build();
 
-        assertEquals( "name", lic1.getName() );
-        assertEquals( "organization", lic1.getOrganization() );
+        assertEquals( "name", lic1.getIssuedTo() );
+        assertEquals( "organization", lic1.getIssuedBy() );
         assertEquals( TIME1, lic1.getExpiryTime() );
         assertEquals( TIME2, lic1.getIssueTime() );
         assertEquals( "value1", lic1.getProperty( "key1" ) );

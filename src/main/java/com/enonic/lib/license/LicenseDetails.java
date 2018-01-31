@@ -10,9 +10,9 @@ import com.google.common.collect.ImmutableMap;
 
 public final class LicenseDetails
 {
-    private final String name;
+    private final String issuedTo;
 
-    private final String organization;
+    private final String issuedBy;
 
     private final Instant issueTime;
 
@@ -22,21 +22,21 @@ public final class LicenseDetails
 
     private LicenseDetails( final Builder builder )
     {
-        this.name = builder.name == null ? "" : builder.name;
-        this.organization = builder.organization == null ? "" : builder.organization;
+        this.issuedTo = builder.issuedTo == null ? "" : builder.issuedTo;
+        this.issuedBy = builder.issuedBy == null ? "" : builder.issuedBy;
         this.issueTime = builder.issueTime;
         this.expiryTime = builder.expiryTime;
         this.data = ImmutableMap.copyOf( builder.data );
     }
 
-    public String getName()
+    public String getIssuedTo()
     {
-        return name;
+        return issuedTo;
     }
 
-    public String getOrganization()
+    public String getIssuedBy()
     {
-        return organization;
+        return issuedBy;
     }
 
     public Instant getIssueTime()
@@ -81,7 +81,7 @@ public final class LicenseDetails
             return false;
         }
         final LicenseDetails that = (LicenseDetails) o;
-        return Objects.equals( name, that.name ) && Objects.equals( organization, that.organization ) &&
+        return Objects.equals( issuedTo, that.issuedTo ) && Objects.equals( issuedBy, that.issuedBy ) &&
             Objects.equals( issueTime, that.issueTime ) && Objects.equals( expiryTime, that.expiryTime ) &&
             Objects.equals( data, that.data );
     }
@@ -89,16 +89,13 @@ public final class LicenseDetails
     @Override
     public int hashCode()
     {
-
-        return Objects.hash( name, organization, issueTime, expiryTime, data );
+        return Objects.hash( issuedTo, issuedBy, issueTime, expiryTime, data );
     }
 
     @Override
     public String toString()
     {
-        return MoreObjects.toStringHelper( this )
-            .add( "name", name )
-            .add( "organization", organization )
+        return MoreObjects.toStringHelper( this ).add( "issuedTo", issuedTo ).add( "issuedBy", issuedBy )
             .add( "issueTime", issueTime )
             .add( "expiryTime", expiryTime )
             .add( "data", data )
@@ -117,9 +114,9 @@ public final class LicenseDetails
 
     public static class Builder
     {
-        private String name;
+        private String issuedTo;
 
-        private String organization;
+        private String issuedBy;
 
         private Instant issueTime;
 
@@ -134,23 +131,23 @@ public final class LicenseDetails
 
         private Builder( final LicenseDetails license )
         {
-            this.name = license.name;
-            this.organization = license.organization;
+            this.issuedTo = license.issuedTo;
+            this.issuedBy = license.issuedBy;
             this.issueTime = license.issueTime;
             this.expiryTime = license.expiryTime;
             this.data = new HashMap<>();
             this.data.putAll( license.data );
         }
 
-        public Builder name( final String name )
+        public Builder issuedTo( final String issuedTo )
         {
-            this.name = name;
+            this.issuedTo = issuedTo;
             return this;
         }
 
-        public Builder organization( final String organization )
+        public Builder issuedBy( final String issuedBy )
         {
-            this.organization = organization;
+            this.issuedBy = issuedBy;
             return this;
         }
 

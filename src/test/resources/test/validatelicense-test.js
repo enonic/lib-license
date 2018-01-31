@@ -10,8 +10,8 @@ exports.testValidateLicense = function () {
     var licenseDetails = licenseLib.validateLicense(license, publicKey);
 
     testing.assertNotNull(licenseDetails);
-    testing.assertEquals('name', licenseDetails.name);
-    testing.assertEquals('org', licenseDetails.organization);
+    testing.assertEquals('issuedBy', licenseDetails.issuedBy);
+    testing.assertEquals('issuedTo', licenseDetails.issuedTo);
 };
 
 exports.testValidateLicenseFromApp = function () {
@@ -21,8 +21,8 @@ exports.testValidateLicenseFromApp = function () {
     var licenseDetails = licenseLib.validateLicense(null, publicKey);
 
     testing.assertNotNull(licenseDetails);
-    testing.assertEquals('name', licenseDetails.name);
-    testing.assertEquals('org', licenseDetails.organization);
+    testing.assertEquals('issuedBy', licenseDetails.issuedBy);
+    testing.assertEquals('issuedTo', licenseDetails.issuedTo);
 };
 
 exports.testValidateLicenseNoParams = function () {
@@ -30,6 +30,6 @@ exports.testValidateLicenseNoParams = function () {
     var licenseDetails = licenseLib.validateLicense();
 
     testing.assertNotNull(licenseDetails);
-    testing.assertEquals('name', licenseDetails.name);
-    testing.assertEquals('org', licenseDetails.organization);
+    testing.assertEquals('issuedBy', licenseDetails.issuedBy);
+    testing.assertEquals('issuedTo', licenseDetails.issuedTo);
 };

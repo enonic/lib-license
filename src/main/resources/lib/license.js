@@ -41,8 +41,8 @@ exports.loadKeyPair = function (keyPairString) {
  *
  * @param {string} privateKey Private key.
  * @param {object} license JSON with the parameters.
- * @param {string} license.name Name.
- * @param {string} license.organization Organization.
+ * @param {string} license.issuedBy The entity that issued this certificate.
+ * @param {string} license.issuedTo The entity this certificate is issued to.
  * @param {string|Date} [license.issueTime] Time when the license was issued.
  * @param {string|Date} [license.expiryTime] Expiration time for the license.
  * @param {object} [license.properties] Custom key-value properties.
@@ -52,11 +52,12 @@ exports.generateLicense = function (privateKey, license) {
     if (privateKey === undefined) {
         throw "Parameter 'privateKey' is required";
     }
-    checkRequired(license, 'name');
+    checkRequired(license, 'issuedBy');
+    checkRequired(license, 'issuedTo');
 
     var bean = __.newBean('com.enonic.lib.license.js.GenerateLicense');
-    bean.name = license.name;
-    bean.organization = license.organization;
+    bean.issuedBy = license.issuedBy;
+    bean.issuedTo = license.issuedTo;
     bean.issueTime = license.issueTime;
     bean.expiryTime = license.expiryTime;
     bean.properties = license.properties || {};

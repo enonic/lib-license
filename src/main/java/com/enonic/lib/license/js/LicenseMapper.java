@@ -18,8 +18,8 @@ public final class LicenseMapper
     @Override
     public void serialize( final MapGenerator gen )
     {
-        gen.value( "name", license.getName() );
-        gen.value( "organization", license.getOrganization() );
+        gen.value( "issuedTo", license.getIssuedTo() );
+        gen.value( "issuedBy", license.getIssuedBy() );
         gen.value( "expiryTime", license.getExpiryTime() );
         gen.value( "issueTime", license.getIssueTime() );
         gen.value( "expired", license.isExpired() );

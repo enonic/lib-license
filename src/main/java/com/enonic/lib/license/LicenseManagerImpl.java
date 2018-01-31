@@ -58,10 +58,17 @@ public final class LicenseManagerImpl
             return null;
         }
 
-        final byte[] licenseDataBytes = Base64.getUrlDecoder().decode( licenseData );
-        final String licenseDataJson = new String( licenseDataBytes, StandardCharsets.UTF_8 );
+        try
+        {
+            final byte[] licenseDataBytes = Base64.getUrlDecoder().decode( licenseData );
+            final String licenseDataJson = new String( licenseDataBytes, StandardCharsets.UTF_8 );
 
-        return LicenseDetailsJSONConverter.parse( licenseDataJson );
+            return LicenseDetailsJSONConverter.parse( licenseDataJson );
+        }
+        catch ( Exception e )
+        {
+            return null;
+        }
     }
 
     private String unwrapLicense( final String license )
@@ -121,7 +128,7 @@ public final class LicenseManagerImpl
 
             return publicSignature.verify( signatureBytes );
         }
-        catch ( GeneralSecurityException e )
+        catch ( Exception e )
         {
             return false;
         }

@@ -19,9 +19,9 @@ public final class GenerateLicense
 {
     private LicenseManager licenseManager;
 
-    private String name;
+    private String issuedBy;
 
-    private String organization;
+    private String issuedTo;
 
     private Instant issueTime;
 
@@ -40,8 +40,8 @@ public final class GenerateLicense
         }
 
         final LicenseDetails licDetails = LicenseDetails.create().
-            name( this.name ).
-            organization( this.organization ).
+            issuedBy( this.issuedBy ).
+            issuedTo( this.issuedTo ).
             expiryTime( this.expiryTime ).
             issueTime( this.issueTime ).
             properties( this.properties ).
@@ -49,14 +49,14 @@ public final class GenerateLicense
         return licenseManager.generateLicense( privateKey, licDetails );
     }
 
-    public void setName( final String name )
+    public void setIssuedBy( final String issuedBy )
     {
-        this.name = name;
+        this.issuedBy = issuedBy;
     }
 
-    public void setOrganization( final String organization )
+    public void setIssuedTo( final String issuedTo )
     {
-        this.organization = organization;
+        this.issuedTo = issuedTo;
     }
 
     public void setIssueTime( final Object issueTime )

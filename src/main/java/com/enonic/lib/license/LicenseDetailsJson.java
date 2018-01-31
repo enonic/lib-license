@@ -8,11 +8,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 final class LicenseDetailsJson
 {
-    @JsonProperty("name")
-    private String name;
+    @JsonProperty("issuedTo")
+    private String issuedTo;
 
-    @JsonProperty("organization")
-    private String organization;
+    @JsonProperty("issuedBy")
+    private String issuedBy;
 
     @JsonProperty("issueTime")
     private String issueTime;
@@ -30,8 +30,8 @@ final class LicenseDetailsJson
 
     public LicenseDetailsJson( final LicenseDetails licenseDetails )
     {
-        this.name = licenseDetails.getName();
-        this.organization = licenseDetails.getOrganization();
+        this.issuedTo = licenseDetails.getIssuedTo();
+        this.issuedBy = licenseDetails.getIssuedBy();
         this.issueTime = instantToString( licenseDetails.getIssueTime() );
         this.expiryTime = instantToString( licenseDetails.getExpiryTime() );
         this.properties = licenseDetails.getProperties();
@@ -40,8 +40,8 @@ final class LicenseDetailsJson
     public LicenseDetails toLicense()
     {
         return LicenseDetails.create().
-            name( this.name ).
-            organization( this.organization ).
+            issuedTo( this.issuedTo ).
+            issuedBy( this.issuedBy ).
             expiryTime( stringToInstant( this.expiryTime ) ).
             issueTime( stringToInstant( this.issueTime ) ).
             properties( this.properties ).
