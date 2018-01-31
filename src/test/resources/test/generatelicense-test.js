@@ -10,7 +10,7 @@ exports.testGenerateLicense = function () {
         name: 'name',
         organization: 'org',
         issueTime: '2018-01-29T11:22:00Z',
-        expiryTime: new Date('2018-01-29T11:22:00Z'),
+        expiryTime: new Date('2058-01-29T11:22:00Z'),
         properties: {
             'nodes': 33
         }

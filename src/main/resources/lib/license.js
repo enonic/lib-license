@@ -64,7 +64,7 @@ exports.generateLicense = function (privateKey, license) {
 
     return __.toNativeObject(bean.generate());
 };
-// TODO params by name to specify appkey
+
 /**
  * Validates a license using the public-key, and returns the license details.
  *

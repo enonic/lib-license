@@ -22,6 +22,7 @@ public final class LicenseMapper
         gen.value( "organization", license.getOrganization() );
         gen.value( "expiryTime", license.getExpiryTime() );
         gen.value( "issueTime", license.getIssueTime() );
+        gen.value( "expired", license.isExpired() );
         gen.map( "data" );
         license.getProperties().forEach( gen::value );
         gen.end();

@@ -64,6 +64,11 @@ public final class LicenseDetails
         return data.getOrDefault( key, defaultValue );
     }
 
+    public boolean isExpired()
+    {
+        return expiryTime != null && Instant.now().isAfter( expiryTime );
+    }
+
     @Override
     public boolean equals( final Object o )
     {

@@ -1,5 +1,8 @@
 package com.enonic.lib.license;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -44,5 +47,25 @@ public class LicenseManagerImplTest
         final LicenseDetails validLicense = licMan.validateLicense( keyPair.getPublicKey(), license );
 
         assertNotNull( validLicense );
+    }
+
+    @Test
+    public void validateExpiredLicense()
+        throws Exception
+    {
+        final LicenseManagerImpl licMan = new LicenseManagerImpl();
+        final KeyPair keyPair = licMan.generateKeyPair();
+        final LicenseDetails licenseDetails = LicenseDetails.create().
+            name( "name" ).
+            organization( "org" ).
+            issueTime( Instant.now() ).
+            expiryTime( Instant.now().minus( 10, ChronoUnit.MINUTES ) ).
+            build();
+        final String license = licMan.generateLicense( keyPair.getPrivateKey(), licenseDetails );
+
+        final LicenseDetails validLicense = licMan.validateLicense( keyPair.getPublicKey(), license );
+
+        assertNotNull( validLicense );
+        assertTrue( validLicense.isExpired() );
     }
 }
