@@ -69,18 +69,22 @@ exports.generateLicense = function (privateKey, license) {
 /**
  * Validates a license using the public-key, and returns the license details.
  *
- * @param {string} [license] Encoded license string. Optional, if not set it will look for it in XP_HOME/license.
- * @param {string} [publicKey] Public key. Optional, if not set it will look for it in the current app.
+ * @param {object} params JSON with the parameters.
+ * @param {string} [params.license] Encoded license string. Optional, if not set it will look for it in 'XP_HOME/license/<appKey>.lic'. Otherwise it will check it is installed in the repository.
+ * @param {string} [params.publicKey] Public key. Optional, if not set it will look for it in the current app.
+ * @param {string} [params.appKey] Application key. If not set it will use the current application key.
+ *
  * @returns {object|null} License details object, or null if the license is not valid.
  */
-exports.validateLicense = function (license, publicKey) {
+exports.validateLicense = function (params) {
+    params = params || {};
     var bean = __.newBean('com.enonic.lib.license.js.ValidateLicense');
-    bean.license = __.nullOrValue(license);
-    bean.publicKey = __.nullOrValue(publicKey);
-    if (license == null) {
-        bean.app = __.nullOrValue(app.name);
+    bean.license = __.nullOrValue(params.license);
+    bean.publicKey = __.nullOrValue(params.publicKey);
+    if (params.license == null) {
+        bean.app = __.nullOrValue(params.appKey || app.name);
     }
-    if (publicKey == null) {
+    if (params.publicKey == null) {
         bean.publicKeyResource = __.nullOrValue(resolve('/app.pub'));
     }
 
@@ -118,7 +122,7 @@ exports.installLicense = function (params) {
 exports.uninstallLicense = function (appKey) {
 
     var bean = __.newBean('com.enonic.lib.license.js.InstallLicense');
-    bean.appKey = __.nullOrValue(params.appKey);
+    bean.appKey = __.nullOrValue(appKey);
 
     return __.toNativeObject(bean.uninstall());
 };

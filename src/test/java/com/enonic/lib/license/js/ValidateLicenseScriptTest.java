@@ -13,6 +13,7 @@ import org.mockito.invocation.InvocationOnMock;
 
 import com.enonic.lib.license.LicenseManager;
 import com.enonic.lib.license.LicenseManagerImpl;
+import com.enonic.xp.node.NodeService;
 import com.enonic.xp.resource.Resource;
 import com.enonic.xp.resource.ResourceKey;
 import com.enonic.xp.resource.ResourceService;
@@ -24,6 +25,8 @@ public class ValidateLicenseScriptTest
     private static Path tempDir;
 
     private ResourceService resourceService;
+
+    private NodeService nodeService;
 
     @BeforeClass
     public static void setUp()
@@ -50,6 +53,8 @@ public class ValidateLicenseScriptTest
         addService( LicenseManager.class, licenseManager );
         this.resourceService = Mockito.mock( ResourceService.class );
         addService( ResourceService.class, resourceService );
+        this.nodeService = Mockito.mock( NodeService.class );
+        addService( NodeService.class, nodeService );
 
         Mockito.when( resourceService.getResource( Mockito.any() ) ).then( this::getResource );
     }

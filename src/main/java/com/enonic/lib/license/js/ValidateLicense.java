@@ -8,12 +8,21 @@ import com.enonic.lib.license.LicenseDetails;
 import com.enonic.lib.license.LicenseManager;
 import com.enonic.lib.license.PublicKey;
 import com.enonic.xp.app.ApplicationKey;
+import com.enonic.xp.branch.Branch;
+import com.enonic.xp.context.Context;
+import com.enonic.xp.context.ContextAccessor;
+import com.enonic.xp.context.ContextBuilder;
 import com.enonic.xp.home.HomeDir;
+import com.enonic.xp.node.Node;
+import com.enonic.xp.node.NodePath;
+import com.enonic.xp.node.NodeService;
 import com.enonic.xp.resource.Resource;
 import com.enonic.xp.resource.ResourceKey;
 import com.enonic.xp.resource.ResourceService;
 import com.enonic.xp.script.bean.BeanContext;
 import com.enonic.xp.script.bean.ScriptBean;
+
+import static com.enonic.lib.license.js.InstallLicense.INSTALLED_LICENSES_PATH;
 
 public final class ValidateLicense
     implements ScriptBean
@@ -22,6 +31,8 @@ public final class ValidateLicense
     private static final String LIC_FILE_EXT = ".lic";
 
     private static final String LICENSE_DIR = "license";
+
+    private NodeService nodeService;
 
     private LicenseManager licenseManager;
 
@@ -63,16 +74,25 @@ public final class ValidateLicense
                 currentApp = ApplicationKey.from( this.app );
             }
 
-            this.license = readLicenseFile( currentApp );
+            this.license = readLicenseFile( currentApp.toString() );
+            if ( this.license == null )
+            {
+                this.license = readLicenseFromRepo( currentApp.toString() );
+            }
         }
 
-        final LicenseDetails licDetails = licenseManager.validateLicense( publicKey, license );
+        if ( this.license == null )
+        {
+            return null;
+        }
+
+        final LicenseDetails licDetails = licenseManager.validateLicense( publicKey, this.license );
         return licDetails == null ? null : new LicenseMapper( licDetails );
     }
 
-    private String readLicenseFile( final ApplicationKey app )
+    private String readLicenseFile( final String appKey )
     {
-        final String fileName = app.toString() + LIC_FILE_EXT;
+        final String fileName = appKey + LIC_FILE_EXT;
         final Path xpHome = HomeDir.get().toFile().toPath();
         final Path licenseDir = xpHome.resolve( LICENSE_DIR );
         final Path licensePath = licenseDir.resolve( fileName );
@@ -83,6 +103,33 @@ public final class ValidateLicense
         try
         {
             return new String( Files.readAllBytes( licensePath ), StandardCharsets.UTF_8 );
+        }
+        catch ( Exception e )
+        {
+            return null;
+        }
+    }
+
+    private String readLicenseFromRepo( final String appKey )
+    {
+        final Context ctxRepo = ContextBuilder.from( ContextAccessor.current() ).
+            repositoryId( InstallLicense.REPO_ID ).
+            branch( Branch.from( "master" ) ).
+            build();
+        return ctxRepo.callWith( () -> loadLicense( appKey ) );
+    }
+
+    private String loadLicense( final String appKey )
+    {
+        try
+        {
+            final NodePath path = NodePath.create( INSTALLED_LICENSES_PATH, appKey ).build();
+            final Node licenseNode = nodeService.getByPath( path );
+            if ( licenseNode == null )
+            {
+                return null;
+            }
+            return licenseNode.data().getString( InstallLicense.NODE_LICENSE_PROPERTY );
         }
         catch ( Exception e )
         {
@@ -115,5 +162,6 @@ public final class ValidateLicense
     {
         this.licenseManager = context.getService( LicenseManager.class ).get();
         this.resourceService = context.getService( ResourceService.class ).get();
+        this.nodeService = context.getService( NodeService.class ).get();
     }
 }

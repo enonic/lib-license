@@ -41,13 +41,13 @@ public final class InstallLicense
 {
     private final static Logger LOG = LoggerFactory.getLogger( InstallLicense.class );
 
-    private static final RepositoryId REPO_ID = RepositoryId.from( "com.enonic.licensemanager" );
+    static final RepositoryId REPO_ID = RepositoryId.from( "com.enonic.licensemanager" );
 
-    private static final String INSTALLED_LICENSES = "installed-licenses";
+    static final String INSTALLED_LICENSES = "installed-licenses";
 
-    private static final NodePath INSTALLED_LICENSES_PATH = NodePath.create( NodePath.ROOT, INSTALLED_LICENSES ).build();
+    static final NodePath INSTALLED_LICENSES_PATH = NodePath.create( NodePath.ROOT, INSTALLED_LICENSES ).build();
 
-    private static final String NODE_LICENSE_PROPERTY = "license";
+    static final String NODE_LICENSE_PROPERTY = "license";
 
     private LicenseManager licenseManager;
 
