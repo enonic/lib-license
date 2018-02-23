@@ -20,6 +20,9 @@ import com.enonic.xp.repository.CreateRepositoryParams;
 import com.enonic.xp.repository.Repository;
 import com.enonic.xp.repository.RepositoryId;
 import com.enonic.xp.repository.RepositoryService;
+import com.enonic.xp.resource.Resource;
+import com.enonic.xp.resource.ResourceKey;
+import com.enonic.xp.resource.ResourceService;
 import com.enonic.xp.script.bean.BeanContext;
 import com.enonic.xp.script.bean.ScriptBean;
 import com.enonic.xp.security.RoleKeys;
@@ -43,7 +46,7 @@ public final class InstallLicense
 
     static final RepositoryId REPO_ID = RepositoryId.from( "com.enonic.licensemanager" );
 
-    static final String INSTALLED_LICENSES = "installed-licenses";
+    private static final String INSTALLED_LICENSES = "installed-licenses";
 
     static final NodePath INSTALLED_LICENSES_PATH = NodePath.create( NodePath.ROOT, INSTALLED_LICENSES ).build();
 
@@ -55,14 +58,26 @@ public final class InstallLicense
 
     private NodeService nodeService;
 
+    private ResourceService resourceService;
+
     private String publicKey;
 
     private String license;
 
     private String appKey;
 
+    private ResourceKey publicKeyResource;
+
     public boolean install()
     {
+        if ( this.publicKey == null && this.publicKeyResource != null )
+        {
+            final Resource pubKeyRes = this.resourceService.getResource( publicKeyResource );
+            if ( pubKeyRes.exists() )
+            {
+                this.publicKey = pubKeyRes.readString();
+            }
+        }
         final PublicKey publicKey = PublicKey.from( this.publicKey );
         if ( publicKey == null )
         {
@@ -212,11 +227,17 @@ public final class InstallLicense
         this.appKey = appKey;
     }
 
+    public void setPublicKeyResource( final ResourceKey publicKeyResource )
+    {
+        this.publicKeyResource = publicKeyResource;
+    }
+
     @Override
     public void initialize( final BeanContext context )
     {
         this.licenseManager = context.getService( LicenseManager.class ).get();
         this.repositoryService = context.getService( RepositoryService.class ).get();
+        this.resourceService = context.getService( ResourceService.class ).get();
         this.nodeService = context.getService( NodeService.class ).get();
     }
 }

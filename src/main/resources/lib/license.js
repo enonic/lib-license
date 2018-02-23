@@ -96,20 +96,22 @@ exports.validateLicense = function (params) {
  *
  * @param {object} params JSON with the parameters.
  * @param {string} params.license Encoded license string.
- * @param {string} params.publicKey Public key to validate the license.
+ * @param {string} [params.publicKey] Public key to validate the license. Optional, if not set it will look for it in the current app.
  * @param {string} params.appKey Application key.
  *
  * @returns {boolean} True if the license was successfully installed, false otherwise.
  */
 exports.installLicense = function (params) {
     checkRequired(params, 'license');
-    checkRequired(params, 'publicKey');
     checkRequired(params, 'appKey');
 
     var bean = __.newBean('com.enonic.lib.license.js.InstallLicense');
     bean.license = __.nullOrValue(params.license);
     bean.publicKey = __.nullOrValue(params.publicKey);
     bean.appKey = __.nullOrValue(params.appKey);
+    if (params.publicKey == null) {
+        bean.publicKeyResource = __.nullOrValue(resolve('/app.pub'));
+    }
 
     return __.toNativeObject(bean.install());
 };
