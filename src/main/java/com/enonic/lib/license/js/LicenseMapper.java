@@ -23,7 +23,7 @@ public final class LicenseMapper
         gen.value( "expiryTime", license.getExpiryTime() );
         gen.value( "issueTime", license.getIssueTime() );
         gen.value( "expired", license.isExpired() );
-        gen.map( "data" );
+        gen.map( "data" ); // TODO data/properties?
         license.getProperties().forEach( gen::value );
         gen.end();
     }

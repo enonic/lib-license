@@ -41,12 +41,12 @@ exports.loadKeyPair = function (keyPairString) {
  *
  * @param {string} privateKey Private key.
  * @param {object} license JSON with the parameters.
- * @param {string} license.issuedBy The entity that issued this certificate.
- * @param {string} license.issuedTo The entity this certificate is issued to.
+ * @param {string} license.issuedBy The entity that issued this license.
+ * @param {string} license.issuedTo The entity this license is issued to.
  * @param {string|Date} [license.issueTime] Time when the license was issued.
  * @param {string|Date} [license.expiryTime] Expiration time for the license.
  * @param {object} [license.properties] Custom key-value properties.
- * @returns {object} License object.
+ * @returns {string} License string.
  */
 exports.generateLicense = function (privateKey, license) {
     if (privateKey === undefined) {
@@ -81,10 +81,46 @@ exports.validateLicense = function (license, publicKey) {
         bean.app = __.nullOrValue(app.name);
     }
     if (publicKey == null) {
-        bean.publicKeyResource = __.nullOrValue(resolve('/license.key'));
+        bean.publicKeyResource = __.nullOrValue(resolve('/app.pub'));
     }
 
     return __.toNativeObject(bean.validate());
+};
+
+/**
+ * Validates and stores a license in a XP node repo.
+ *
+ * @param {object} params JSON with the parameters.
+ * @param {string} params.license Encoded license string.
+ * @param {string} params.publicKey Public key to validate the license.
+ * @param {string} params.appKey Application key.
+ *
+ * @returns {boolean} True if the license was successfully installed, false otherwise.
+ */
+exports.installLicense = function (params) {
+    checkRequired(params, 'license');
+    checkRequired(params, 'publicKey');
+    checkRequired(params, 'appKey');
+
+    var bean = __.newBean('com.enonic.lib.license.js.InstallLicense');
+    bean.license = __.nullOrValue(params.license);
+    bean.publicKey = __.nullOrValue(params.publicKey);
+    bean.appKey = __.nullOrValue(params.appKey);
+
+    return __.toNativeObject(bean.install());
+};
+
+/**
+ * Removes an installed license from XP repo.
+ *
+ * @param {string} appKey Application key.
+ */
+exports.uninstallLicense = function (appKey) {
+
+    var bean = __.newBean('com.enonic.lib.license.js.InstallLicense');
+    bean.appKey = __.nullOrValue(params.appKey);
+
+    return __.toNativeObject(bean.uninstall());
 };
 
 function checkRequired(params, name) {
