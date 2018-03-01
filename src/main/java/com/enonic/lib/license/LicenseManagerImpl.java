@@ -34,7 +34,7 @@ import com.enonic.xp.security.RoleKeys;
 import com.enonic.xp.security.User;
 import com.enonic.xp.security.auth.AuthenticationInfo;
 
-@Component(immediate = true)
+@Component(immediate = true, service = LicenseManager.class)
 public final class LicenseManagerImpl
     implements LicenseManager
 {
