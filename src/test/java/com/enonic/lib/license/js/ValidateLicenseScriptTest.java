@@ -13,6 +13,7 @@ import org.mockito.invocation.InvocationOnMock;
 
 import com.enonic.lib.license.LicenseManager;
 import com.enonic.lib.license.LicenseManagerImpl;
+import com.enonic.xp.app.ApplicationKey;
 import com.enonic.xp.node.NodeService;
 import com.enonic.xp.resource.Resource;
 import com.enonic.xp.resource.ResourceKey;
@@ -49,13 +50,13 @@ public class ValidateLicenseScriptTest
         setAppKey( "com.enonic.app.myapp" );
         super.initialize();
 
-        final LicenseManager licenseManager = new LicenseManagerImpl();
+        final LicenseManagerImpl licenseManager = new LicenseManagerImpl();
+        licenseManager.setCurrentApp( ApplicationKey.from( "com.enonic.myapp" ) );
         addService( LicenseManager.class, licenseManager );
         this.resourceService = Mockito.mock( ResourceService.class );
-        addService( ResourceService.class, resourceService );
         this.nodeService = Mockito.mock( NodeService.class );
-        addService( NodeService.class, nodeService );
-
+        licenseManager.setResourceService( resourceService );
+        licenseManager.setNodeService( nodeService );
         Mockito.when( resourceService.getResource( Mockito.any() ) ).then( this::getResource );
     }
 

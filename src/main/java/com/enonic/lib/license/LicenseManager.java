@@ -7,4 +7,6 @@ public interface LicenseManager
     String generateLicense( PrivateKey privateKey, LicenseDetails license );
 
     LicenseDetails validateLicense( PublicKey publicKey, String license );
+
+    LicenseDetails validateLicense( String appKey );
 }

@@ -1,6 +1,8 @@
 package com.enonic.lib.license;
 
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
@@ -13,6 +15,24 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
+import com.enonic.xp.app.ApplicationKey;
+import com.enonic.xp.branch.Branch;
+import com.enonic.xp.context.Context;
+import com.enonic.xp.context.ContextAccessor;
+import com.enonic.xp.context.ContextBuilder;
+import com.enonic.xp.home.HomeDir;
+import com.enonic.xp.node.Node;
+import com.enonic.xp.node.NodePath;
+import com.enonic.xp.node.NodeService;
+import com.enonic.xp.repository.RepositoryId;
+import com.enonic.xp.resource.Resource;
+import com.enonic.xp.resource.ResourceKey;
+import com.enonic.xp.resource.ResourceService;
+import com.enonic.xp.security.RoleKeys;
+import com.enonic.xp.security.User;
+import com.enonic.xp.security.auth.AuthenticationInfo;
 
 @Component(immediate = true)
 public final class LicenseManagerImpl
@@ -21,6 +41,36 @@ public final class LicenseManagerImpl
     static final int KEY_SIZE = 2048;
 
     private static final String LICENSE_HEADER = "LICENSE";
+
+    private static final String LIC_FILE_EXT = ".lic";
+
+    private static final String LICENSE_DIR = "license";
+
+    public static final RepositoryId REPO_ID = RepositoryId.from( "com.enonic.licensemanager" );
+
+    private static final String INSTALLED_LICENSES = "installed-licenses";
+
+    public static final NodePath INSTALLED_LICENSES_PATH = NodePath.create( NodePath.ROOT, INSTALLED_LICENSES ).build();
+
+    public static final String NODE_LICENSE_PROPERTY = "license";
+
+    private NodeService nodeService;
+
+    private ResourceService resourceService;
+
+    private ApplicationKey currentApp;
+
+    public LicenseManagerImpl()
+    {
+        try
+        {
+            currentApp = ApplicationKey.from( getClass() );
+        }
+        catch ( NullPointerException e )
+        {
+            currentApp = null;
+        }
+    }
 
     @Override
     public KeyPair generateKeyPair()
@@ -69,6 +119,42 @@ public final class LicenseManagerImpl
         {
             return null;
         }
+    }
+
+    @Override
+    public LicenseDetails validateLicense( String appKey )
+    {
+        final ApplicationKey app = this.currentApp;
+        final Resource pubKeyRes = this.resourceService.getResource( ResourceKey.from( app, "/app.pub" ) );
+        if ( !pubKeyRes.exists() )
+        {
+            return null;
+        }
+
+        String publicKeyStr = pubKeyRes.readString();
+        final com.enonic.lib.license.PublicKey publicKey = com.enonic.lib.license.PublicKey.from( publicKeyStr );
+        if ( publicKey == null )
+        {
+            return null;
+        }
+
+        if ( appKey == null )
+        {
+            appKey = app.toString();
+        }
+
+        String license = readLicenseFile( appKey );
+        if ( license == null )
+        {
+            license = readLicenseFromRepo( appKey );
+        }
+
+        if ( license == null )
+        {
+            return null;
+        }
+
+        return this.validateLicense( publicKey, license );
     }
 
     private String unwrapLicense( final String license )
@@ -144,5 +230,70 @@ public final class LicenseManagerImpl
         {
             throw new RuntimeException( e );
         }
+    }
+
+    private String readLicenseFile( final String appKey )
+    {
+        final String fileName = appKey + LIC_FILE_EXT;
+        final Path xpHome = HomeDir.get().toFile().toPath();
+        final Path licenseDir = xpHome.resolve( LICENSE_DIR );
+        final Path licensePath = licenseDir.resolve( fileName );
+        if ( !licensePath.toFile().isFile() )
+        {
+            return null;
+        }
+        try
+        {
+            return new String( Files.readAllBytes( licensePath ), StandardCharsets.UTF_8 );
+        }
+        catch ( Exception e )
+        {
+            return null;
+        }
+    }
+
+    private String readLicenseFromRepo( final String appKey )
+    {
+        final Context ctxRepo = ContextBuilder.from( ContextAccessor.current() ).
+            repositoryId( REPO_ID ).
+            branch( Branch.from( "master" ) ).
+            authInfo( AuthenticationInfo.create().principals( RoleKeys.ADMIN ).user( User.ANONYMOUS ).build() ).
+            build();
+        return ctxRepo.callWith( () -> loadLicense( appKey ) );
+    }
+
+    private String loadLicense( final String appKey )
+    {
+        try
+        {
+            final NodePath path = NodePath.create( INSTALLED_LICENSES_PATH, appKey ).build();
+            final Node licenseNode = nodeService.getByPath( path );
+            if ( licenseNode == null )
+            {
+                return null;
+            }
+            return licenseNode.data().getString( NODE_LICENSE_PROPERTY );
+        }
+        catch ( Exception e )
+        {
+            return null;
+        }
+    }
+
+    public void setCurrentApp( final ApplicationKey currentApp )
+    {
+        this.currentApp = currentApp;
+    }
+
+    @Reference
+    public void setNodeService( final NodeService nodeService )
+    {
+        this.nodeService = nodeService;
+    }
+
+    @Reference
+    public void setResourceService( final ResourceService resourceService )
+    {
+        this.resourceService = resourceService;
     }
 }

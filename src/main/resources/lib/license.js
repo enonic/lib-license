@@ -81,9 +81,7 @@ exports.validateLicense = function (params) {
     var bean = __.newBean('com.enonic.lib.license.js.ValidateLicense');
     bean.license = __.nullOrValue(params.license);
     bean.publicKey = __.nullOrValue(params.publicKey);
-    if (params.license == null) {
-        bean.app = __.nullOrValue(params.appKey || app.name);
-    }
+    bean.app = __.nullOrValue(params.appKey || app.name);
     if (params.publicKey == null) {
         bean.publicKeyResource = __.nullOrValue(resolve('/app.pub'));
     }

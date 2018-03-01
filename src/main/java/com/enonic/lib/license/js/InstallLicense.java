@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import com.enonic.lib.license.LicenseDetails;
 import com.enonic.lib.license.LicenseManager;
+import com.enonic.lib.license.LicenseManagerImpl;
 import com.enonic.lib.license.PublicKey;
 import com.enonic.xp.branch.Branch;
 import com.enonic.xp.context.Context;
@@ -18,7 +19,6 @@ import com.enonic.xp.node.NodeService;
 import com.enonic.xp.node.UpdateNodeParams;
 import com.enonic.xp.repository.CreateRepositoryParams;
 import com.enonic.xp.repository.Repository;
-import com.enonic.xp.repository.RepositoryId;
 import com.enonic.xp.repository.RepositoryService;
 import com.enonic.xp.resource.Resource;
 import com.enonic.xp.resource.ResourceKey;
@@ -43,14 +43,6 @@ public final class InstallLicense
     implements ScriptBean
 {
     private final static Logger LOG = LoggerFactory.getLogger( InstallLicense.class );
-
-    static final RepositoryId REPO_ID = RepositoryId.from( "com.enonic.licensemanager" );
-
-    private static final String INSTALLED_LICENSES = "installed-licenses";
-
-    static final NodePath INSTALLED_LICENSES_PATH = NodePath.create( NodePath.ROOT, INSTALLED_LICENSES ).build();
-
-    static final String NODE_LICENSE_PROPERTY = "license";
 
     private LicenseManager licenseManager;
 
@@ -98,7 +90,7 @@ public final class InstallLicense
         }
 
         final Context ctxSudo = ContextBuilder.from( currentCtx ).
-            repositoryId( REPO_ID ).
+            repositoryId( LicenseManagerImpl.REPO_ID ).
             branch( Branch.from( "master" ) ).
             authInfo( AuthenticationInfo.create().principals( RoleKeys.ADMIN ).user( User.ANONYMOUS ).build() ).
             build();
@@ -109,7 +101,7 @@ public final class InstallLicense
         }
 
         final Context ctxRepo = ContextBuilder.from( currentCtx ).
-            repositoryId( REPO_ID ).
+            repositoryId( LicenseManagerImpl.REPO_ID ).
             branch( Branch.from( "master" ) ).
             build();
         ctxRepo.runWith( this::storeLicense );
@@ -127,13 +119,13 @@ public final class InstallLicense
         }
 
         final Context ctx = ContextBuilder.from( currentCtx ).
-            repositoryId( REPO_ID ).
+            repositoryId( LicenseManagerImpl.REPO_ID ).
             branch( Branch.from( "master" ) ).
             authInfo( AuthenticationInfo.create().principals( RoleKeys.ADMIN ).user( User.ANONYMOUS ).build() ).
             build();
 
         ctx.runWith( () -> {
-            if ( repositoryService.isInitialized( REPO_ID ) )
+            if ( repositoryService.isInitialized( LicenseManagerImpl.REPO_ID ) )
             {
                 deleteLicense();
             }
@@ -143,9 +135,9 @@ public final class InstallLicense
     private void storeLicense()
     {
         PropertyTree data = new PropertyTree();
-        data.setString( NODE_LICENSE_PROPERTY, this.license );
+        data.setString( LicenseManagerImpl.NODE_LICENSE_PROPERTY, this.license );
 
-        final NodePath path = NodePath.create( INSTALLED_LICENSES_PATH, appKey ).build();
+        final NodePath path = NodePath.create( LicenseManagerImpl.INSTALLED_LICENSES_PATH, appKey ).build();
         if ( nodeService.nodeExists( path ) )
         {
             final UpdateNodeParams updateNode = UpdateNodeParams.create().
@@ -157,7 +149,7 @@ public final class InstallLicense
         }
 
         final CreateNodeParams createNode = CreateNodeParams.create().
-            parent( INSTALLED_LICENSES_PATH ).
+            parent( LicenseManagerImpl.INSTALLED_LICENSES_PATH ).
             name( appKey ).
             data( data ).
             inheritPermissions( true ).
@@ -167,13 +159,13 @@ public final class InstallLicense
 
     private void deleteLicense()
     {
-        final NodePath path = NodePath.create( INSTALLED_LICENSES_PATH, appKey ).build();
+        final NodePath path = NodePath.create( LicenseManagerImpl.INSTALLED_LICENSES_PATH, appKey ).build();
         nodeService.deleteByPath( path );
     }
 
     private boolean initializeRepo()
     {
-        if ( !repositoryService.isInitialized( REPO_ID ) )
+        if ( !repositoryService.isInitialized( LicenseManagerImpl.REPO_ID ) )
         {
             final AccessControlList acl = AccessControlList.create().
                 add( AccessControlEntry.create().
@@ -183,7 +175,7 @@ public final class InstallLicense
                 build();
 
             final CreateRepositoryParams createRepo = CreateRepositoryParams.create().
-                repositoryId( REPO_ID ).
+                repositoryId( LicenseManagerImpl.REPO_ID ).
                 rootPermissions( acl ).
                 build();
             final Repository repo = repositoryService.createRepository( createRepo );
@@ -191,12 +183,12 @@ public final class InstallLicense
 
         try
         {
-            if ( nodeService.nodeExists( INSTALLED_LICENSES_PATH ) )
+            if ( nodeService.nodeExists( LicenseManagerImpl.INSTALLED_LICENSES_PATH ) )
             {
                 return true;
             }
             final CreateNodeParams createNode = CreateNodeParams.create().
-                name( INSTALLED_LICENSES ).
+                name( LicenseManagerImpl.INSTALLED_LICENSES_PATH.getName() ).
                 inheritPermissions( true ).
                 parent( NodePath.ROOT ).
                 build();
