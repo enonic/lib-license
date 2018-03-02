@@ -3,7 +3,6 @@ package com.enonic.lib.license.js;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.enonic.lib.license.LicenseDetails;
 import com.enonic.lib.license.LicenseManager;
 import com.enonic.lib.license.LicenseManagerImpl;
 import com.enonic.lib.license.PublicKey;
@@ -11,14 +10,8 @@ import com.enonic.xp.branch.Branch;
 import com.enonic.xp.context.Context;
 import com.enonic.xp.context.ContextAccessor;
 import com.enonic.xp.context.ContextBuilder;
-import com.enonic.xp.data.PropertyTree;
-import com.enonic.xp.node.CreateNodeParams;
-import com.enonic.xp.node.Node;
 import com.enonic.xp.node.NodePath;
 import com.enonic.xp.node.NodeService;
-import com.enonic.xp.node.UpdateNodeParams;
-import com.enonic.xp.repository.CreateRepositoryParams;
-import com.enonic.xp.repository.Repository;
 import com.enonic.xp.repository.RepositoryService;
 import com.enonic.xp.resource.Resource;
 import com.enonic.xp.resource.ResourceKey;
@@ -27,17 +20,7 @@ import com.enonic.xp.script.bean.BeanContext;
 import com.enonic.xp.script.bean.ScriptBean;
 import com.enonic.xp.security.RoleKeys;
 import com.enonic.xp.security.User;
-import com.enonic.xp.security.acl.AccessControlEntry;
-import com.enonic.xp.security.acl.AccessControlList;
 import com.enonic.xp.security.auth.AuthenticationInfo;
-
-import static com.enonic.xp.security.acl.Permission.CREATE;
-import static com.enonic.xp.security.acl.Permission.DELETE;
-import static com.enonic.xp.security.acl.Permission.MODIFY;
-import static com.enonic.xp.security.acl.Permission.PUBLISH;
-import static com.enonic.xp.security.acl.Permission.READ;
-import static com.enonic.xp.security.acl.Permission.READ_PERMISSIONS;
-import static com.enonic.xp.security.acl.Permission.WRITE_PERMISSIONS;
 
 public final class InstallLicense
     implements ScriptBean
@@ -76,37 +59,7 @@ public final class InstallLicense
             throw new IllegalArgumentException( "Invalid public key" );
         }
 
-        final LicenseDetails licDetails = licenseManager.validateLicense( publicKey, license );
-        if ( licDetails == null )
-        {
-            return false;
-        }
-
-        final Context currentCtx = ContextAccessor.current();
-        if ( !currentCtx.getAuthInfo().hasRole( RoleKeys.AUTHENTICATED ) )
-        {
-            LOG.warn( "License could not be installed, user not authenticated" );
-            return false;
-        }
-
-        final Context ctxSudo = ContextBuilder.from( currentCtx ).
-            repositoryId( LicenseManagerImpl.REPO_ID ).
-            branch( Branch.from( "master" ) ).
-            authInfo( AuthenticationInfo.create().principals( RoleKeys.ADMIN ).user( User.ANONYMOUS ).build() ).
-            build();
-
-        if ( !ctxSudo.callWith( this::initializeRepo ) )
-        {
-            return false;
-        }
-
-        final Context ctxRepo = ContextBuilder.from( currentCtx ).
-            repositoryId( LicenseManagerImpl.REPO_ID ).
-            branch( Branch.from( "master" ) ).
-            build();
-        ctxRepo.runWith( this::storeLicense );
-
-        return true;
+        return licenseManager.installLicense( license, publicKey, appKey );
     }
 
     public void uninstall()
@@ -132,76 +85,10 @@ public final class InstallLicense
         } );
     }
 
-    private void storeLicense()
-    {
-        PropertyTree data = new PropertyTree();
-        data.setString( LicenseManagerImpl.NODE_LICENSE_PROPERTY, this.license );
-
-        final NodePath path = NodePath.create( LicenseManagerImpl.INSTALLED_LICENSES_PATH, appKey ).build();
-        if ( nodeService.nodeExists( path ) )
-        {
-            final UpdateNodeParams updateNode = UpdateNodeParams.create().
-                path( path ).
-                editor( node -> node.data = data ).
-                build();
-            nodeService.update( updateNode );
-            return;
-        }
-
-        final CreateNodeParams createNode = CreateNodeParams.create().
-            parent( LicenseManagerImpl.INSTALLED_LICENSES_PATH ).
-            name( appKey ).
-            data( data ).
-            inheritPermissions( true ).
-            build();
-        nodeService.create( createNode );
-    }
-
     private void deleteLicense()
     {
         final NodePath path = NodePath.create( LicenseManagerImpl.INSTALLED_LICENSES_PATH, appKey ).build();
         nodeService.deleteByPath( path );
-    }
-
-    private boolean initializeRepo()
-    {
-        if ( !repositoryService.isInitialized( LicenseManagerImpl.REPO_ID ) )
-        {
-            final AccessControlList acl = AccessControlList.create().
-                add( AccessControlEntry.create().
-                    principal( RoleKeys.AUTHENTICATED ).
-                    allow( READ, CREATE, MODIFY, DELETE, PUBLISH, READ_PERMISSIONS, WRITE_PERMISSIONS ).
-                    build() ).
-                build();
-
-            final CreateRepositoryParams createRepo = CreateRepositoryParams.create().
-                repositoryId( LicenseManagerImpl.REPO_ID ).
-                rootPermissions( acl ).
-                build();
-            final Repository repo = repositoryService.createRepository( createRepo );
-        }
-
-        try
-        {
-            if ( nodeService.nodeExists( LicenseManagerImpl.INSTALLED_LICENSES_PATH ) )
-            {
-                return true;
-            }
-            final CreateNodeParams createNode = CreateNodeParams.create().
-                name( LicenseManagerImpl.INSTALLED_LICENSES_PATH.getName() ).
-                inheritPermissions( true ).
-                parent( NodePath.ROOT ).
-                build();
-
-            final Node node = nodeService.create( createNode );
-
-            return true;
-        }
-        catch ( Exception e )
-        {
-            LOG.warn( "Could not initialize license repo", e );
-            return false;
-        }
     }
 
     public void setPublicKey( final String publicKey )
