@@ -12,12 +12,17 @@ import java.security.Signature;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 import com.enonic.xp.app.ApplicationKey;
 import com.enonic.xp.branch.Branch;
@@ -81,6 +86,8 @@ public final class LicenseManagerImpl
 
     private ApplicationKey currentApp;
 
+    private final Cache<String, Optional<LicenseDetails>> appValidationCache;
+
     public LicenseManagerImpl()
     {
         try
@@ -91,6 +98,7 @@ public final class LicenseManagerImpl
         {
             currentApp = null;
         }
+        this.appValidationCache = CacheBuilder.newBuilder().maximumSize( 10 ).expireAfterWrite( 20, TimeUnit.SECONDS ).build();
     }
 
     @Override
@@ -143,7 +151,23 @@ public final class LicenseManagerImpl
     }
 
     @Override
-    public LicenseDetails validateLicense( String appKey )
+    public LicenseDetails validateLicense( final String appKey )
+    {
+        try
+        {
+            final Optional<LicenseDetails> licenseValue = appValidationCache.get( appKey, () -> {
+                final LicenseDetails license = doValidateLicense( appKey );
+                return license == null ? Optional.empty() : Optional.of( license );
+            } );
+            return licenseValue.orElse( null );
+        }
+        catch ( Exception e )
+        {
+            throw new RuntimeException( e.getMessage(), e );
+        }
+    }
+
+    private LicenseDetails doValidateLicense( String appKey )
     {
         final ApplicationKey app = this.currentApp;
         final Resource pubKeyRes = this.resourceService.getResource( ResourceKey.from( app, "/app.pub" ) );
@@ -181,6 +205,13 @@ public final class LicenseManagerImpl
     @Override
     public boolean installLicense( final String license, final com.enonic.lib.license.PublicKey publicKey, final String appKey )
     {
+        final boolean installed = doInstallLicense( license, publicKey, appKey );
+        appValidationCache.invalidate( appKey );
+        return installed;
+    }
+
+    private boolean doInstallLicense( final String license, final com.enonic.lib.license.PublicKey publicKey, final String appKey )
+    {
         final LicenseDetails licDetails = this.validateLicense( publicKey, license );
         if ( licDetails == null )
         {
@@ -216,6 +247,13 @@ public final class LicenseManagerImpl
 
     @Override
     public boolean uninstallLicense( final String appKey )
+    {
+        final boolean uninstalled = doUninstallLicense( appKey );
+        appValidationCache.invalidate( appKey );
+        return uninstalled;
+    }
+
+    private boolean doUninstallLicense( final String appKey )
     {
         final Context currentCtx = ContextAccessor.current();
         if ( !currentCtx.getAuthInfo().hasRole( RoleKeys.AUTHENTICATED ) )

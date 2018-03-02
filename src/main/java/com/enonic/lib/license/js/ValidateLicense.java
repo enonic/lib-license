@@ -53,7 +53,7 @@ public final class ValidateLicense
         final PublicKey publicKey = PublicKey.from( this.publicKey );
         if ( publicKey == null )
         {
-            throw new IllegalArgumentException( "Public key not found" );
+            return null;
         }
 
         if ( app == null )
