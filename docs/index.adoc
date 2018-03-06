@@ -1,6 +1,6 @@
 = License Library
 
-This library contains functions to generate and validate licenses. An application can use the license to control where and how software is able to run.
+This library contains functions to generate and validate licenses. An application can use the license to control where and how the software is able to run.
 License validation is based on public key cryptography.
 
 To start using this library, add the following into your `build.gradle` file:
