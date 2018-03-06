@@ -1,6 +1,7 @@
 = License Library
 
-This library contains functions to generate and validate licenses using public key cryptography.
+This library contains functions to generate and validate licenses. An application can use the license to control where and how software is able to run.
+License validation is based on public key cryptography.
 
 To start using this library, add the following into your `build.gradle` file:
 
@@ -15,8 +16,8 @@ dependencies {
 
 The following steps are a typical example of using the license library in an app:
 
-1. The application developer generates a key pair: private and public keys.
-2. The developer adds the public key to the application, as a file.
+1. The application developer generates a key pair: a private and a public key.
+2. The developer adds the public key to the application, as a resource file.
 3. A user requests a license. The dev generates a license using the private key.
 4. The user receives the license file and uploads it to the app.
 5. The app validates the license, using the public key, and installs it in the XP repo.
@@ -112,7 +113,7 @@ licenseLib.installLicense({
 });
 ----
 
-After the license has been installed, it can be validating by just passing the ```appKey``` parameter.
+After the license has been installed, it can be validated by just passing the ```appKey``` parameter.
 
 [source,js]
 ----
@@ -182,7 +183,7 @@ Validates and stores a license in the XP node repo.
 
 *Parameters*
 
-* `options` (_object_) Object with the parameters to validate a license.
+* `options` (_object_) Object with the parameters to install a license.
 ** `*license*` (_string_) Encoded license string.
 ** `*publicKey*` (_string_) Public key to validate the license. Optional, if not set it will look for it in the current app.
 ** `*appKey*` (_string_) Application key.
