@@ -1,0 +1,201 @@
+= License Library
+
+This library contains functions to generate and validate licenses using public key cryptography.
+
+To start using this library, add the following into your `build.gradle` file:
+
+[source,groovy]
+----
+dependencies {
+  include 'com.enonic.lib:lib-license:1.0.0'
+}
+----
+
+== Usage
+
+The following steps are a typical example of using the license library in an app:
+
+1. The application developer generates a key pair: private and public keys.
+2. The developer adds the public key to the application, as a file.
+3. A user requests a license. The dev generates a license using the private key.
+4. The user receives the license file and uploads it to the app.
+5. The app validates the license, using the public key, and installs it in the XP repo.
+6. After that the app can check the installed license and implement some logic depending on it.
+
+To use this library in your JavaScript code, it first needs to be required:
+
+[source,js]
+----
+var licenseLib = require('/lib/license');
+----
+
+=== Generate a key pair
+
+License generation in this library is based on public key cryptography. We start by generating a *key pair*, which is a *private key* and a *public key* that are linked to each other.
+The private key is used to generate new licenses. And those new licenses can only be validated using the public key.
+Only one key pair per application is needed.
+
+[source,js]
+----
+var keyPair = licenseLib.generateKeyPair(); <1>
+var privateKey = keyPair.privatekey;        <2>
+var publicKey = keyPair.publicKey;          <3>
+----
+<1> Generate a new keyPair for each application that will requires licenses to be used.
+<2> The private key should be kept in a safe place.
+<3> The public key should be included in the application.
+
+=== Generate a license
+
+Every customer installation using the application will need a new license.
+
+License generation is done outside of the application that will use it.
+
+To generate a new license call the ``generateLicense`` function, using the private key generated in the previous step.
+
+[source,js]
+----
+var license = licenseLib.generateLicense(privateKey, {
+    issuedBy: 'Enonic',                       <1>
+    issuedTo: 'Acme Corporation',             <2>
+    issueTime: '2017-10-01T09:11:00Z',        <3>
+    expiryTime: new Date(2018, 9, 1, 9,11,0), <4>
+    properties: {
+        'widgets': 42                         <5>
+    }
+});
+----
+<1> The organization or entity that issues the license.
+<2> The organization or entity this license is issued to.
+<3> Issue date and time, in string format in this example.
+<4> Expiration date and time, using a Date object in this example.
+<5> Other optional custom properties.
+
+
+=== Validate a license
+
+To validate a license from the application call the ``validateLicense`` function.
+
+This function uses the public key to validate and decode the license string.
+The public key can be passed explicitly or it can be included as a file in the application instead.
+In the latter case the public key file should be placed in ```'src/main/resources/app.pub'```.
+
+[source,js]
+----
+var licenseDetails = licenseLib.validateLicense({
+    license: license,
+    appKey: 'com.enonic.myapp'
+});
+
+var isValid = licenseDetails && !licenseDetails.expired;
+if (!isValid) {
+    showErrorMessage();
+    return;
+}
+
+var issuedTo = licenseDetails.issuedTo;
+var widgets = licenseDetails.properties.widgets;
+----
+
+IMPORTANT: It is very important that only the public key is included in the application. The private key must never be accessible, except for the issuer of licenses.
+
+
+=== Installing a license
+
+Once a license has been validated by the app, it can be installed in the XP repo.
+
+[source,js]
+----
+licenseLib.installLicense({
+    license: licenseStr,
+    appKey: 'com.enonic.myapp'
+});
+----
+
+After the license has been installed, it can be validating by just passing the ```appKey``` parameter.
+
+[source,js]
+----
+licenseLib.installLicense({appKey: 'com.enonic.myapp'});
+----
+
+== API
+
+The following functions are defined in this library.
+
+=== `generateKeyPair`
+
+Generates a public/private key pair to be used for license generation and validation.
+
+*Returns*
+
+The function will return a new key-pair object with the following properties:
+
+* `*privateKey*` (_string_) Base64 encoded string of the private key.
+* `*publicKey*` (_string_) Base64 encoded string of the public key.
+
+=== `generateLicense`
+
+Generates a license based on a private key and license details.
+
+*Parameters*
+
+* `privateKey` (_string_) Private key string.
+* `license` (_object_) Object with the license details.
+** `*issuedBy*` (_string_) The entity that issued this license.
+** `*issuedTo*` (_string_) The entity this license is issued to.
+** `*issueTime*` (_string_ | _Date_) Time when the license was issued.
+** `*expiryTime*` (_string_ | _Date_) Expiration time for the license.
+** `*properties*` (_object_) Custom key-value properties. Optional
+
+*Returns*
+
+The function will return the license string.
+
+=== `validateLicense`
+
+Validates a license using the public key, and returns the license details if successful.
+
+*Parameters*
+
+* `options` (_object_) Object with the parameters to validate a license.
+** `*license*` (_string_) Encoded license string. Optional.
+** `*publicKey*` (_string_) Public key. Optional.
+** `*appKey*` (_string_) Application key. Optional.
+
+*Returns*
+
+The function will return the license details object, or null if the license is not valid.
+
+All the parameters are optional. When called without parameters:
+
+* it will look for the license file in 'XP_HOME/license/<appKey>.lic'. Otherwise it will check if it is installed in the repository (see `installLicense` function).
+* it will look for the publicKey as a file with path "src/main/resources/app.pub" in the current app.
+* it will use the current application's key.
+
+TIP: The ``appKey`` parameter does not necessarily need to be the same as the application key.
+It is possible for a group of apps to use the same license, they just need to pass the same appKey when calling the validateLicense function.
+
+=== `installLicense`
+
+Validates and stores a license in the XP node repo.
+
+*Parameters*
+
+* `options` (_object_) Object with the parameters to validate a license.
+** `*license*` (_string_) Encoded license string.
+** `*publicKey*` (_string_) Public key to validate the license. Optional, if not set it will look for it in the current app.
+** `*appKey*` (_string_) Application key.
+
+*Returns*
+
+The function will return ``true`` if the license was successfully installed, ``false`` otherwise.
+
+=== `uninstallLicense`
+
+Removes an installed license from the XP repo.
+
+*Parameters*
+
+* `*appKey*` (_string_) Application key.
+
