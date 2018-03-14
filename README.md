@@ -7,7 +7,7 @@ License Library for Enonic XP
 
 This library contains functions to generate and validate licenses using public key cryptography.
 
-<img align="right" alt="Lib License Logo" width="128" src="https://rawgithub.com/enonic/lib-license/master/license-lib-logo.svg">
+<img align="right" alt="Lib License Logo" width="128" src="./license-lib-logo.svg">
 
 ## Building
 
