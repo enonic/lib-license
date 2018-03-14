@@ -1,7 +1,63 @@
-= License Library
+= Application Licensing
 
-This library contains functions to generate and validate licenses. An application can use the license to control where and how the software is able to run.
-License validation is based on public key cryptography.
+[[licensemanager]]
+== License Manager
+
+License Manager is an XP tool that can be used by application developers to control where and how their applications are able to run.
+
+This tool works by generating a private and a public key for an application. Those keys can then be used to generate and validate licenses for specific users.
+
+image::images/license-manager.png[]
+
+=== Add an application
+
+To add an application click on the ``"New Application"`` button. A pop up dialog will appear with 2 fields:
+
+* ``Name``: The application name.
+* ``Notes``: A free text field to write comments about the app.
+
+After pressing ``"Save"``, the application details will be shown. A key pair will be automatically generated for the application.
+The *key pair* consists of a *private key* and a *public key* that are linked to each other.
+
+The private key is needed for generating licenses. It should be kept in a secure location.
+
+The public key is needed for validating licenses. It should be included in the application where it will be used. See more details below in the <<licenselibrary>> section.
+
+NOTE: The application and license data is stored in a separate node repository in XP (with id ``"com.enonic.licensemanager"``).
+
+=== Generate a license
+
+To generate a license, select one of the applications and then click on the ``"New License"`` button.
+A pop up dialog will appear with the following fields:
+
+* ``Issued by``: The organization or entity that issues this license.
+* ``Issued to``: The organization or entity this license is issued to.
+* ``Issue Date``: Date from which the license will be valid.
+* ``Expiration Date``: Date from which the license will no longer be valid.
+
+Click on ``"Create License"`` and a license with the given details will be generated. The license will be stored and will be listed under the application details.
+
+Click on the license to view its properties. In the details view there is a ``"Download"`` button to download the license file.
+This file is what should be sent to the user that requested the license.
+
+=== Delete an application
+
+To delete an application, select one of the applications and then click on the ``"Delete Application"`` button. Then confirm the operation.
+
+All the licenses generated for the application will also be deleted.
+
+=== Delete a license
+
+To delete a license, select the application the license belongs to, and then click on the license. Click on the ``"Delete"`` button to confirm the operation.
+
+Note that deleting a license that has already been sent to the user will not invalidate it. This is because the validation key for that license is already in the user's computer.
+The only thing that could be done to invalidate an installed license is to generate a new key pair for the next release version of the app.
+
+
+[[licenselibrary]]
+== License Library
+
+This library contains functions to generate and validate licenses. License validation is based on public key cryptography.
 
 To start using this library, add the following into your `build.gradle` file:
 
@@ -12,9 +68,9 @@ dependencies {
 }
 ----
 
-== Usage
+=== Usage
 
-The following steps are a typical example of using the license library in an app:
+The following steps show a typical example of using the license library in an app:
 
 1. The application developer generates a key pair: a private and a public key.
 2. The developer adds the public key to the application, as a resource file.
@@ -22,6 +78,8 @@ The following steps are a typical example of using the license library in an app
 4. The user receives the license file and uploads it to the app.
 5. The app validates the license, using the public key, and installs it in the XP repo.
 6. After that the app can check the installed license and implement some logic depending on it.
+
+Steps 1 and 3 can be done using the <<licensemanager>> app. Although it is also possible to implement it using the functions in this library.
 
 To use this library in your JavaScript code, it first needs to be required:
 
@@ -43,7 +101,7 @@ var privateKey = keyPair.privatekey;        <2>
 var publicKey = keyPair.publicKey;          <3>
 ----
 <1> Generate a new keyPair for each application that will requires licenses to be used.
-<2> The private key should be kept in a safe place.
+<2> The private key should be kept in a secure place.
 <3> The public key should be included in the application.
 
 === Generate a license
