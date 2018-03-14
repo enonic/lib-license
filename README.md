@@ -7,6 +7,7 @@ License Library for Enonic XP
 
 This library contains functions to generate and validate licenses using public key cryptography.
 
+<img align="right" alt="Log Browser Logo" src="https://rawgithub.com/enonic/lib-license/master/license-lib-logo.svg" width="128">
 
 ## Building
 
@@ -16,18 +17,6 @@ To build this project, execute the following:
 ./gradlew clean build
 ```
 
-## Publishing
-
-To release this project, execute the following:
-
-```
-./gradlew clean build uploadArchives
-```
-
 ## Documentation
 
-Building the documentation is done executing the following:
-
-```
-./gradlew buildDoc
-```
+[See documentation for this library and License Manager app here.](docs/index.adoc)
