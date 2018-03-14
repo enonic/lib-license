@@ -42,19 +42,12 @@ import com.enonic.xp.repository.RepositoryService;
 import com.enonic.xp.resource.Resource;
 import com.enonic.xp.resource.ResourceKey;
 import com.enonic.xp.resource.ResourceService;
+import com.enonic.xp.security.PrincipalKey;
 import com.enonic.xp.security.RoleKeys;
 import com.enonic.xp.security.User;
 import com.enonic.xp.security.acl.AccessControlEntry;
 import com.enonic.xp.security.acl.AccessControlList;
 import com.enonic.xp.security.auth.AuthenticationInfo;
-
-import static com.enonic.xp.security.acl.Permission.CREATE;
-import static com.enonic.xp.security.acl.Permission.DELETE;
-import static com.enonic.xp.security.acl.Permission.MODIFY;
-import static com.enonic.xp.security.acl.Permission.PUBLISH;
-import static com.enonic.xp.security.acl.Permission.READ;
-import static com.enonic.xp.security.acl.Permission.READ_PERMISSIONS;
-import static com.enonic.xp.security.acl.Permission.WRITE_PERMISSIONS;
 
 @Component(immediate = true, service = LicenseManager.class)
 public final class LicenseManagerImpl
@@ -71,6 +64,8 @@ public final class LicenseManagerImpl
     private static final String LICENSE_DIR = "license";
 
     public static final RepositoryId REPO_ID = RepositoryId.from( "com.enonic.licensemanager" );
+
+    public static final PrincipalKey MANAGER_ROLE = PrincipalKey.ofRole( "com.enonic.app.licensemanager" );
 
     private static final String INSTALLED_LICENSES = "installed-licenses";
 
@@ -314,8 +309,12 @@ public final class LicenseManagerImpl
         {
             final AccessControlList acl = AccessControlList.create().
                 add( AccessControlEntry.create().
-                    principal( RoleKeys.AUTHENTICATED ).
-                    allow( READ, CREATE, MODIFY, DELETE, PUBLISH, READ_PERMISSIONS, WRITE_PERMISSIONS ).
+                    principal( RoleKeys.ADMIN ).
+                    allowAll().
+                    build() ).
+                add( AccessControlEntry.create().
+                    principal( MANAGER_ROLE ).
+                    allowAll().
                     build() ).
                 build();
 
