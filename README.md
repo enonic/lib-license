@@ -5,7 +5,7 @@ License Library for Enonic XP
 
 [![Build Status](https://travis-ci.org/enonic/lib-license.svg?branch=master)](https://travis-ci.org/enonic/lib-license)
 [![codecov](https://codecov.io/gh/enonic/lib-license/branch/master/graph/badge.svg)](https://codecov.io/gh/enonic/lib-license)
-[![License](https://img.shields.io/github/license/enonic/lib-license.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
+[![License](https://img.shields.io/badge/license-Apache-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
 This library contains functions to generate and validate licenses using public key cryptography.
 
