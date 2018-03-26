@@ -5,7 +5,7 @@ var licenseLib = require('/lib/license');
 exports.testGenerateLicense = function () {
 
     var privateKey = testInstance.load(resolve('generate_private_key.txt'));
-    print(privateKey);
+
     var license = licenseLib.generateLicense(privateKey, {
         issuedBy: 'issuedBy',
         issuedTo: 'issuedTo',
@@ -15,10 +15,10 @@ exports.testGenerateLicense = function () {
             'nodes': 33
         }
     });
-    print(JSON.stringify(license));
+
     testing.assertNotNull(license);
     var expectedLicense = testInstance.load(resolve('generate_license.txt'));
-    print(JSON.stringify(expectedLicense));
-    testing.assertEquals(expectedLicense, license);
+
+    testing.assertEquals(expectedLicense, license, JSON.stringify(license, null, 2) + ' -> ' + JSON.stringify(expectedLicense, null, 2));
 
 };
