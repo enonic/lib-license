@@ -1,4 +1,4 @@
-var testing = require('/lib/xp/testing.js');
+var testing = require('/lib/xp/testing');
 var licenseLib = require('/lib/license');
 
 
