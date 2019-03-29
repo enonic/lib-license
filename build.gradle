@@ -17,6 +17,7 @@ dependencies {
     compile 'com.google.guava:guava:18.0'
     testCompile 'junit:junit:4.12'
     testCompile "com.enonic.xp:testing:${xpVersion}"
+    testCompile "org.mockito:mockito-core:+"
 }
 
 jacocoTestReport {
