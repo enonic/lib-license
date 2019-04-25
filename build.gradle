@@ -1,21 +1,23 @@
 plugins {
     id 'java'
     id 'jacoco'
-    id 'maven'
-    id 'com.enonic.defaults' version '1.0.3'
-    id 'com.enonic.xp.doc' version '1.0.7'
+    id 'maven-publish'
+    id 'com.enonic.defaults' version '2.0.1'
+    id 'com.enonic.xp.base' version '2.0.0'
 }
 
 repositories {
+    mavenLocal()
     jcenter()
     xp.enonicRepo()
 }
 
 dependencies {
     compile "com.enonic.xp:script-api:${xpVersion}"
-    compile 'com.google.guava:guava:18.0'
+    compile 'com.google.guava:guava:23.0'
     testCompile 'junit:junit:4.12'
     testCompile "com.enonic.xp:testing:${xpVersion}"
+    testCompile "org.mockito:mockito-core:+"
 }
 
 jacocoTestReport {
