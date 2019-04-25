@@ -28,7 +28,7 @@ public final class ValidateLicense
 
     public LicenseMapper validate()
     {
-        if ( app != null )
+        if ( app != null && license == null)
         {
             final LicenseDetails licDetails = licenseManager.validateLicense( app );
             if ( licDetails != null )
