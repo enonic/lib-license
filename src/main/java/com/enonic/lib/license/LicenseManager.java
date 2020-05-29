@@ -40,7 +40,7 @@ public interface LicenseManager
      * <p>The public key file should be located in the current app resources with path "/app.pub".
      * <p>The license string will be looked up in the license directory and if it is installed in the node repository.
      * <p>The path for licenses in the filesystem is 'XP_HOME/license/[appKey].lic'
-     * <p>The node repository for installed licenses is 'com.enonic.licensemanager'. Licenses will be stored in a node with path '/installed-licenses/[appKey]'
+     * <p>The node repository for installed licenses is 'system-repo'. Licenses will be stored in a node with path '/licenses/[appKey]'
      *
      * @param appKey Application key used to locate the license.
      * @return Object containing the license details. Or {@code null} if the license was not validated.
@@ -50,7 +50,7 @@ public interface LicenseManager
     /**
      * Stores a license in the Enonic node repository.
      * <p>Before installing it, the license is validated using the public key.
-     * <p>The id of the node repository 'com.enonic.licensemanager'.
+     * <p>The id of the node repository 'system-repo'.
      * <p>If the node repository does not exist, it will be created.
      * <p>If the current user in context is not authenticated the installation will fail and the method will return false.
      *
@@ -63,7 +63,7 @@ public interface LicenseManager
 
     /**
      * Removes a license from the Enonic node repository.
-     * <p>The id of the node repository 'com.enonic.licensemanager'.
+     * <p>The id of the node repository 'system-repo'.
      * <p>If the current user in context is not authenticated the removal will fail and the method will return false.
      *
      * @param appKey Application key used to store the license.

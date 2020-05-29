@@ -63,11 +63,11 @@ public final class LicenseManagerImpl
 
     private static final String LICENSE_DIR = "license";
 
-    public static final RepositoryId REPO_ID = RepositoryId.from( "com.enonic.licensemanager" );
+    public static final RepositoryId REPO_ID = RepositoryId.from( "system-repo" );
 
     public static final PrincipalKey MANAGER_ROLE = PrincipalKey.ofRole( "com.enonic.app.licensemanager" );
 
-    private static final String INSTALLED_LICENSES = "installed-licenses";
+    private static final String INSTALLED_LICENSES = "licenses";
 
     public static final NodePath INSTALLED_LICENSES_PATH = NodePath.create( NodePath.ROOT, INSTALLED_LICENSES ).build();
 

@@ -165,7 +165,7 @@ public class LicenseManagerImplTest
         final PropertyTree nodeData = new PropertyTree();
         nodeData.setString( "license", license );
         final Node node = Node.create().data( nodeData ).build();
-        Mockito.when( nodeService.getByPath( eq( NodePath.create( "/installed-licenses/com.enonic.myapp" ).build() ) ) ).thenReturn( node );
+        Mockito.when( nodeService.getByPath( eq( NodePath.create( "/licenses/com.enonic.myapp" ).build() ) ) ).thenReturn( node );
 
         final LicenseDetails validLicense = licMan.validateLicense( "com.enonic.myapp" );
 

@@ -23,7 +23,9 @@ The private key is needed for generating licenses. It should be kept in a secure
 
 The public key is needed for validating licenses. It should be included in the application where it will be used. See more details below in the <<licenselibrary>> section.
 
-NOTE: The application and license data is stored in a separate node repository in XP (with id ``"com.enonic.licensemanager"``).
+NOTE: The application data is stored in a separate node repository in XP (with id ``"com.enonic.licensemanager"``).
+
+NOTE: The license data is stored in the ``"system-repo"`` node repository.
 
 === Generate a license
 
@@ -257,4 +259,3 @@ Removes an installed license from the XP repo.
 *Parameters*
 
 * `*appKey*` (_string_) Application key.
-
