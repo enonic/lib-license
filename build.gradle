@@ -14,16 +14,16 @@ repositories {
 
 dependencies {
     compileOnly "com.enonic.xp:script-api:${xpVersion}"
-    compile 'com.google.guava:guava:23.0'
-    testCompile 'junit:junit:4.13.2'
-    testCompile "com.enonic.xp:testing:${xpVersion}"
-    testCompile "org.mockito:mockito-core:3.12.4"
+    implementation 'com.google.guava:guava:23.0'
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation "com.enonic.xp:testing:${xpVersion}"
+    testImplementation "org.mockito:mockito-core:3.12.4"
 }
 
 jacocoTestReport {
     reports {
-        xml.enabled = true
-        html.enabled = true
+        xml.required = true
+        html.required = true
     }
 }
 
