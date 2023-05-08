@@ -98,9 +98,9 @@ Only one key pair per application is needed.
 
 [source,js]
 ----
-var keyPair = licenseLib.generateKeyPair(); <1>
-var privateKey = keyPair.privatekey;        <2>
-var publicKey = keyPair.publicKey;          <3>
+var keyPair = licenseLib.generateKeyPair(); // <1>
+var privateKey = keyPair.privatekey;        // <2>
+var publicKey = keyPair.publicKey;          // <3>
 ----
 <1> Generate a new keyPair for each application that will requires licenses to be used.
 <2> The private key should be kept in a secure place.
@@ -117,12 +117,12 @@ To generate a new license call the ``generateLicense`` function, using the priva
 [source,js]
 ----
 var license = licenseLib.generateLicense(privateKey, {
-    issuedBy: 'Enonic',                       <1>
-    issuedTo: 'Acme Corporation',             <2>
-    issueTime: '2017-10-01T09:11:00Z',        <3>
-    expiryTime: new Date(2018, 9, 1, 9,11,0), <4>
+    issuedBy: 'Enonic',                       // <1>
+    issuedTo: 'Acme Corporation',             // <2>
+    issueTime: '2017-10-01T09:11:00Z',        // <3>
+    expiryTime: new Date(2018, 9, 1, 9,11,0), // <4>
     properties: {
-        'widgets': 42                         <5>
+        'widgets': 42                         // <5>
     }
 });
 ----
