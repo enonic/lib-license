@@ -1,12 +1,8 @@
 package com.enonic.lib.license.js;
 
 import java.time.Instant;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
-import jdk.nashorn.api.scripting.ScriptObjectMirror;
 
 import com.enonic.lib.license.LicenseDetails;
 import com.enonic.lib.license.LicenseManager;
@@ -59,14 +55,14 @@ public final class GenerateLicense
         this.issuedTo = issuedTo;
     }
 
-    public void setIssueTime( final Object issueTime )
+    public void setIssueTime( final String issueTime )
     {
-        this.issueTime = toInstant( issueTime );
+        this.issueTime = issueTime != null ? Instant.parse( issueTime ) : null;
     }
 
-    public void setExpiryTime( final Object expiryTime )
+    public void setExpiryTime( final String expiryTime )
     {
-        this.expiryTime = toInstant( expiryTime );
+        this.expiryTime = expiryTime != null ? Instant.parse( expiryTime ) : null;
     }
 
     public void setProperties( final Map<String, Object> properties )
@@ -77,56 +73,6 @@ public final class GenerateLicense
     public void setPrivateKey( final String privateKey )
     {
         this.privateKey = privateKey;
-    }
-
-
-    private Instant toInstant( final Object value )
-    {
-        if ( value instanceof Instant )
-        {
-            return (Instant) value;
-        }
-        if ( value instanceof Date )
-        {
-            return ( (Date) value ).toInstant();
-        }
-        if ( value instanceof String )
-        {
-            return stringToInstant( (String) value );
-        }
-        if ( value instanceof ScriptObjectMirror )
-        {
-            try
-            {
-                final Long epochMilli = ( (ScriptObjectMirror) value ).to( Long.class );
-                return Instant.ofEpochMilli( epochMilli );
-            }
-            catch ( Exception e )
-            {
-                return null;
-            }
-        }
-        return null;
-    }
-
-    private Instant stringToInstant( final String instant )
-    {
-        if ( instant == null )
-        {
-            return null;
-        }
-        else
-        {
-            DateTimeFormatter f = DateTimeFormatter.ISO_INSTANT;
-            try
-            {
-                return Instant.from( f.parse( instant ) );
-            }
-            catch ( Exception e )
-            {
-                return null;
-            }
-        }
     }
 
     private Map<String, String> filterMap( final Map<String, Object> values )

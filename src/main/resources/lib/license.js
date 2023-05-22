@@ -56,12 +56,12 @@ exports.generateLicense = function (privateKey, license) {
     checkRequired(license, 'issuedTo');
 
     var bean = __.newBean('com.enonic.lib.license.js.GenerateLicense');
-    bean.issuedBy = license.issuedBy;
-    bean.issuedTo = license.issuedTo;
-    bean.issueTime = license.issueTime;
-    bean.expiryTime = license.expiryTime;
-    bean.properties = license.properties || {};
-    bean.privateKey = privateKey;
+    bean.setIssuedBy(license.issuedBy);
+    bean.setIssuedTo(license.issuedTo);
+    bean.setIssueTime(safeToIsoString(license.issueTime));
+    bean.setExpiryTime(safeToIsoString(license.expiryTime));
+    bean.setProperties(license.properties || {});
+    bean.setPrivateKey(privateKey);
 
     return __.toNativeObject(bean.generate());
 };
@@ -79,11 +79,11 @@ exports.generateLicense = function (privateKey, license) {
 exports.validateLicense = function (params) {
     params = params || {};
     var bean = __.newBean('com.enonic.lib.license.js.ValidateLicense');
-    bean.license = __.nullOrValue(params.license);
-    bean.publicKey = __.nullOrValue(params.publicKey);
-    bean.app = __.nullOrValue(params.appKey || app.name);
+    bean.setLicense(__.nullOrValue(params.license));
+    bean.setPublicKey(__.nullOrValue(params.publicKey));
+    bean.setApp(__.nullOrValue(params.appKey || app.name));
     if (params.publicKey == null) {
-        bean.publicKeyResource = __.nullOrValue(resolve('/app.pub'));
+        bean.setPublicKeyResource(__.nullOrValue(resolve('/app.pub')));
     }
 
     return __.toNativeObject(bean.validate());
@@ -104,11 +104,11 @@ exports.installLicense = function (params) {
     checkRequired(params, 'appKey');
 
     var bean = __.newBean('com.enonic.lib.license.js.InstallLicense');
-    bean.license = __.nullOrValue(params.license);
-    bean.publicKey = __.nullOrValue(params.publicKey);
-    bean.appKey = __.nullOrValue(params.appKey);
+    bean.setLicense(__.nullOrValue(params.license));
+    bean.setPublicKey(__.nullOrValue(params.publicKey));
+    bean.setAppKey(__.nullOrValue(params.appKey));
     if (params.publicKey == null) {
-        bean.publicKeyResource = __.nullOrValue(resolve('/app.pub'));
+        bean.setPublicKeyResource(__.nullOrValue(resolve('/app.pub')));
     }
 
     return __.toNativeObject(bean.install());
@@ -122,7 +122,7 @@ exports.installLicense = function (params) {
 exports.uninstallLicense = function (appKey) {
 
     var bean = __.newBean('com.enonic.lib.license.js.InstallLicense');
-    bean.appKey = __.nullOrValue(appKey);
+    bean.setAppKey(__.nullOrValue(appKey));
 
     return __.toNativeObject(bean.uninstall());
 };
@@ -130,5 +130,13 @@ exports.uninstallLicense = function (appKey) {
 function checkRequired(params, name) {
     if (params[name] === undefined) {
         throw "Parameter '" + name + "' is required";
+    }
+}
+
+function safeToIsoString(value) {
+    if (typeof value === 'object' && value !== null && 'toISOString' in value) {
+        return value.toISOString();
+    } else {
+        return value;
     }
 }
