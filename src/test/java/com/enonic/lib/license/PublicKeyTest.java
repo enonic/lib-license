@@ -3,10 +3,13 @@ package com.enonic.lib.license;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 
 import static com.enonic.lib.license.LicenseManagerImpl.KEY_SIZE;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class PublicKeyTest
 {

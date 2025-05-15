@@ -10,6 +10,7 @@ import com.enonic.xp.branch.Branch;
 import com.enonic.xp.context.Context;
 import com.enonic.xp.context.ContextAccessor;
 import com.enonic.xp.context.ContextBuilder;
+import com.enonic.xp.node.DeleteNodeParams;
 import com.enonic.xp.node.NodePath;
 import com.enonic.xp.node.NodeService;
 import com.enonic.xp.repository.RepositoryService;
@@ -87,8 +88,8 @@ public final class InstallLicense
 
     private void deleteLicense()
     {
-        final NodePath path = NodePath.create( LicenseManagerImpl.INSTALLED_LICENSES_PATH, appKey ).build();
-        nodeService.deleteByPath( path );
+        final NodePath path = NodePath.create( LicenseManagerImpl.INSTALLED_LICENSES_PATH ).addElement( appKey ).build();
+        nodeService.delete( DeleteNodeParams.create().nodePath( path ).build() );
     }
 
     public void setPublicKey( final String publicKey )

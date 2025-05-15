@@ -14,6 +14,8 @@ public final class ValidateLicense
     implements ScriptBean
 {
 
+    private ApplicationKey inApp;
+
     private LicenseManager licenseManager;
 
     private ResourceService resourceService;
@@ -58,7 +60,7 @@ public final class ValidateLicense
 
         if ( app == null )
         {
-            app = ApplicationKey.from( getClass() ).toString();
+            app = inApp.toString();
         }
 
         final LicenseDetails licDetails = licenseManager.validateLicense( publicKey, this.license );
@@ -88,6 +90,7 @@ public final class ValidateLicense
     @Override
     public void initialize( final BeanContext context )
     {
+        this.inApp = context.getApplicationKey();
         this.licenseManager = context.getService( LicenseManager.class ).get();
         this.resourceService = context.getService( ResourceService.class ).get();
     }

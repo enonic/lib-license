@@ -1,20 +1,5 @@
 package com.enonic.lib.license;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-
-import org.apache.commons.io.FileUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mockito;
-
-import com.enonic.lib.license.js.ValidateLicenseScriptTest;
 import com.enonic.xp.app.ApplicationKey;
 import com.enonic.xp.context.Context;
 import com.enonic.xp.context.ContextAccessor;
@@ -25,7 +10,6 @@ import com.enonic.xp.node.NodePath;
 import com.enonic.xp.node.NodeService;
 import com.enonic.xp.repository.RepositoryId;
 import com.enonic.xp.repository.RepositoryService;
-import com.enonic.xp.resource.BytesResource;
 import com.enonic.xp.resource.Resource;
 import com.enonic.xp.resource.ResourceKey;
 import com.enonic.xp.resource.ResourceService;
@@ -33,33 +17,56 @@ import com.enonic.xp.resource.UrlResource;
 import com.enonic.xp.security.RoleKeys;
 import com.enonic.xp.security.User;
 import com.enonic.xp.security.auth.AuthenticationInfo;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import org.mockito.Answers;
+import org.mockito.Mock;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
 
-import static org.junit.Assert.*;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class LicenseManagerImplTest
 {
-    private static Path tempDir;
+    @TempDir
+    static Path tempDir;
 
-    @Before
-    public void setUp()
+    static final ApplicationKey app = ApplicationKey.from( "com.enonic.myapp" );
+
+    @BeforeAll
+    public static void setUp()
+            throws Exception
     {
-        initLicenseFolder();
+        System.setProperty( "xp.home", tempDir.toAbsolutePath().toString() );
     }
 
-    @After
-    public void tearDown()
-        throws IOException
+    @AfterAll
+    public static void tearDown()
+            throws IOException
     {
         System.clearProperty( "xp.home" );
-        FileUtils.deleteDirectory( tempDir.toFile() );
     }
 
     @Test
     public void generateKeyPair()
     {
-        final LicenseManagerImpl licMan = new LicenseManagerImpl();
+        final BundleContext bundleContext = mock( BundleContext.class, Answers.RETURNS_DEEP_STUBS );
+        when( bundleContext.getBundle().getSymbolicName() ).thenReturn( app.getName() );
+        final LicenseManagerImpl licMan = new LicenseManagerImpl( bundleContext );
+
         final KeyPair keyPair = licMan.generateKeyPair();
 
         assertNotNull( keyPair );
@@ -70,7 +77,10 @@ public class LicenseManagerImplTest
     @Test
     public void generateLicense()
     {
-        final LicenseManagerImpl licMan = new LicenseManagerImpl();
+        final BundleContext bundleContext = mock( BundleContext.class, Answers.RETURNS_DEEP_STUBS );
+        when( bundleContext.getBundle().getSymbolicName() ).thenReturn( app.getName() );
+        final LicenseManagerImpl licMan = new LicenseManagerImpl( bundleContext );
+
         final KeyPair keyPair = licMan.generateKeyPair();
 
         final LicenseDetails licenseDetails = LicenseDetails.create().issuedTo( "name" ).issuedBy( "org" ).build();
@@ -82,7 +92,10 @@ public class LicenseManagerImplTest
     @Test
     public void validateLicense()
     {
-        final LicenseManagerImpl licMan = new LicenseManagerImpl();
+        final BundleContext bundleContext = mock( BundleContext.class, Answers.RETURNS_DEEP_STUBS );
+        when( bundleContext.getBundle().getSymbolicName() ).thenReturn( app.getName() );
+        final LicenseManagerImpl licMan = new LicenseManagerImpl( bundleContext );
+
         final KeyPair keyPair = licMan.generateKeyPair();
         final LicenseDetails licenseDetails = LicenseDetails.create().issuedTo( "name" ).issuedBy( "org" ).build();
         final String license = licMan.generateLicense( keyPair.getPrivateKey(), licenseDetails );
@@ -95,7 +108,10 @@ public class LicenseManagerImplTest
     @Test
     public void validateExpiredLicense()
     {
-        final LicenseManagerImpl licMan = new LicenseManagerImpl();
+        final BundleContext bundleContext = mock( BundleContext.class, Answers.RETURNS_DEEP_STUBS );
+        when( bundleContext.getBundle().getSymbolicName() ).thenReturn( app.getName() );
+        final LicenseManagerImpl licMan = new LicenseManagerImpl( bundleContext );
+
         final KeyPair keyPair = licMan.generateKeyPair();
         final LicenseDetails licenseDetails = LicenseDetails.create().
             issuedTo( "name" ).
@@ -115,23 +131,27 @@ public class LicenseManagerImplTest
     public void validateLicenseInFile()
         throws Exception
     {
-        final LicenseManagerImpl licMan = new LicenseManagerImpl();
-        final ApplicationKey app = ApplicationKey.from( "com.enonic.myapp" );
-        licMan.setCurrentApp( app );
+        final BundleContext bundleContext = mock( BundleContext.class, Answers.RETURNS_DEEP_STUBS );
+        when( bundleContext.getBundle().getSymbolicName() ).thenReturn( app.getName() );
+        final LicenseManagerImpl licMan = new LicenseManagerImpl( bundleContext );
 
-        final RepositoryService repoService = Mockito.mock( RepositoryService.class );
-        final NodeService nodeService = Mockito.mock( NodeService.class );
-        final ResourceService resourceService = Mockito.mock( ResourceService.class );
+        final ApplicationKey app = ApplicationKey.from( "com.enonic.myapp" );
+
+        final RepositoryService repoService = mock( RepositoryService.class );
+        final NodeService nodeService = mock( NodeService.class );
+        final ResourceService resourceService = mock( ResourceService.class );
         licMan.setRepositoryService( repoService );
         licMan.setNodeService( nodeService );
         licMan.setResourceService( resourceService );
 
-        setLicenseFile( "com.enonic.myapp" );
+
+        final Path licFile = Files.createDirectory( tempDir.resolve( "license" ) ).resolve( app + ".lic" );
+        Files.copy( LicenseManagerImplTest.class.getClassLoader().getResourceAsStream( "test/validate_license.txt" ), licFile );
 
         final ResourceKey key = ResourceKey.from( app, "/app.pub" );
         final URL url = getClass().getResource( "/myapp" + key.getPath() );
         final Resource res = new UrlResource( key, url );
-        Mockito.when( resourceService.getResource( eq( key ) ) ).thenReturn( res );
+        when( resourceService.getResource( eq( key ) ) ).thenReturn( res );
 
         final LicenseDetails validLicense = licMan.validateLicense( "com.enonic.myapp" );
 
@@ -142,13 +162,15 @@ public class LicenseManagerImplTest
     public void validateLicenseInRepo()
         throws Exception
     {
-        final LicenseManagerImpl licMan = new LicenseManagerImpl();
-        final ApplicationKey app = ApplicationKey.from( "com.enonic.myapp" );
-        licMan.setCurrentApp( app );
+        Files.deleteIfExists(tempDir.resolve( "license" ).resolve( app + ".lic" ) );
 
-        final RepositoryService repoService = Mockito.mock( RepositoryService.class );
-        final NodeService nodeService = Mockito.mock( NodeService.class );
-        final ResourceService resourceService = Mockito.mock( ResourceService.class );
+        final BundleContext bundleContext = mock( BundleContext.class, Answers.RETURNS_DEEP_STUBS );
+        when( bundleContext.getBundle().getSymbolicName() ).thenReturn( app.getName() );
+        final LicenseManagerImpl licMan = new LicenseManagerImpl( bundleContext );
+
+        final RepositoryService repoService = mock( RepositoryService.class );
+        final NodeService nodeService = mock( NodeService.class );
+        final ResourceService resourceService = mock( ResourceService.class );
         licMan.setRepositoryService( repoService );
         licMan.setNodeService( nodeService );
         licMan.setResourceService( resourceService );
@@ -156,8 +178,11 @@ public class LicenseManagerImplTest
         final KeyPair keyPair = licMan.generateKeyPair();
 
         final ResourceKey key = ResourceKey.from( app, "/app.pub" );
-        final BytesResource res = new BytesResource( key, keyPair.getPublicKey().serialize().getBytes( "UTF-8" ) );
-        Mockito.when( resourceService.getResource( eq( key ) ) ).thenReturn( res );
+        final Resource resource = mock( Resource.class );
+        when( resource.exists() ).thenReturn( true );
+        when( resource.readString() ).thenReturn( keyPair.getPublicKey().serialize() );
+
+        when( resourceService.getResource( eq( key ) ) ).thenReturn( resource );
 
         final LicenseDetails licenseDetails = LicenseDetails.create().issuedTo( "name" ).issuedBy( "org" ).build();
         final String license = licMan.generateLicense( keyPair.getPrivateKey(), licenseDetails );
@@ -165,7 +190,7 @@ public class LicenseManagerImplTest
         final PropertyTree nodeData = new PropertyTree();
         nodeData.setString( "license", license );
         final Node node = Node.create().data( nodeData ).build();
-        Mockito.when( nodeService.getByPath( eq( NodePath.create( "/licenses/com.enonic.myapp" ).build() ) ) ).thenReturn( node );
+        when( nodeService.getByPath( eq( NodePath.create().addElement( "licenses" ).addElement( "com.enonic.myapp" ).build() ) ) ).thenReturn( node );
 
         final LicenseDetails validLicense = licMan.validateLicense( "com.enonic.myapp" );
 
@@ -175,10 +200,12 @@ public class LicenseManagerImplTest
     @Test
     public void installLicense()
     {
-        final LicenseManagerImpl licMan = new LicenseManagerImpl();
+        final BundleContext bundleContext = mock( BundleContext.class, Answers.RETURNS_DEEP_STUBS );
+        when( bundleContext.getBundle().getSymbolicName() ).thenReturn( app.getName() );
+        final LicenseManagerImpl licMan = new LicenseManagerImpl( bundleContext );
 
-        final RepositoryService repoService = Mockito.mock( RepositoryService.class );
-        final NodeService nodeService = Mockito.mock( NodeService.class );
+        final RepositoryService repoService = mock( RepositoryService.class );
+        final NodeService nodeService = mock( NodeService.class );
         licMan.setRepositoryService( repoService );
         licMan.setNodeService( nodeService );
 
@@ -199,10 +226,12 @@ public class LicenseManagerImplTest
     @Test
     public void installLicenseNotAuthenticated()
     {
-        final LicenseManagerImpl licMan = new LicenseManagerImpl();
+        final BundleContext bundleContext = mock( BundleContext.class, Answers.RETURNS_DEEP_STUBS );
+        when( bundleContext.getBundle().getSymbolicName() ).thenReturn( app.getName() );
+        final LicenseManagerImpl licMan = new LicenseManagerImpl( bundleContext );
 
-        final RepositoryService repoService = Mockito.mock( RepositoryService.class );
-        final NodeService nodeService = Mockito.mock( NodeService.class );
+        final RepositoryService repoService = mock( RepositoryService.class );
+        final NodeService nodeService = mock( NodeService.class );
         licMan.setRepositoryService( repoService );
         licMan.setNodeService( nodeService );
 
@@ -218,14 +247,16 @@ public class LicenseManagerImplTest
     @Test
     public void installLicenseReplaceExisting()
     {
-        final LicenseManagerImpl licMan = new LicenseManagerImpl();
+        final BundleContext bundleContext = mock( BundleContext.class, Answers.RETURNS_DEEP_STUBS );
+        when( bundleContext.getBundle().getSymbolicName() ).thenReturn( app.getName() );
+        final LicenseManagerImpl licMan = new LicenseManagerImpl( bundleContext );
 
-        final RepositoryService repoService = Mockito.mock( RepositoryService.class );
-        final NodeService nodeService = Mockito.mock( NodeService.class );
+        final RepositoryService repoService = mock( RepositoryService.class );
+        final NodeService nodeService = mock( NodeService.class );
         licMan.setRepositoryService( repoService );
         licMan.setNodeService( nodeService );
 
-        Mockito.when( nodeService.nodeExists( any( NodePath.class ) ) ).thenReturn( true );
+        when( nodeService.nodeExists( any( NodePath.class ) ) ).thenReturn( true );
 
         final KeyPair keyPair = licMan.generateKeyPair();
         final LicenseDetails licenseDetails = LicenseDetails.create().issuedTo( "name" ).issuedBy( "org" ).build();
@@ -244,14 +275,16 @@ public class LicenseManagerImplTest
     @Test
     public void uninstallLicense()
     {
-        final LicenseManagerImpl licMan = new LicenseManagerImpl();
+        final BundleContext bundleContext = mock( BundleContext.class, Answers.RETURNS_DEEP_STUBS );
+        when( bundleContext.getBundle().getSymbolicName() ).thenReturn( app.getName() );
+        final LicenseManagerImpl licMan = new LicenseManagerImpl( bundleContext );
 
-        final RepositoryService repoService = Mockito.mock( RepositoryService.class );
-        final NodeService nodeService = Mockito.mock( NodeService.class );
+        final RepositoryService repoService = mock( RepositoryService.class );
+        final NodeService nodeService = mock( NodeService.class );
         licMan.setRepositoryService( repoService );
         licMan.setNodeService( nodeService );
 
-        Mockito.when( repoService.isInitialized( any( RepositoryId.class ) ) ).thenReturn( true );
+        when( repoService.isInitialized( any( RepositoryId.class ) ) ).thenReturn( true );
 
         final Context ctxAuthenticated = ContextBuilder.from( ContextAccessor.current() ).
             authInfo( AuthenticationInfo.create().principals( RoleKeys.AUTHENTICATED ).user( User.ANONYMOUS ).build() ).
@@ -260,28 +293,5 @@ public class LicenseManagerImplTest
         final boolean uninstalled = ctxAuthenticated.callWith( () -> licMan.uninstallLicense( "com.enonic.myapp" ) );
 
         assertTrue( uninstalled );
-    }
-
-    private void setLicenseFile( final String appKey )
-        throws IOException
-    {
-        final Path licenseFolder = Files.createDirectory( tempDir.resolve( "license" ) );
-        final Path licFile = licenseFolder.resolve( appKey + ".lic" );
-        File srcFile = new File( LicenseManagerImplTest.class.getClassLoader().getResource( "test/validate_license.txt" ).getFile() );
-        Files.copy( srcFile.toPath(), licFile );
-    }
-
-    private static void initLicenseFolder()
-    {
-        try
-        {
-            final Class<ValidateLicenseScriptTest> clazz = ValidateLicenseScriptTest.class;
-            tempDir = Files.createTempDirectory( clazz.getCanonicalName() );
-            System.setProperty( "xp.home", tempDir.toAbsolutePath().toString() );
-        }
-        catch ( Exception e )
-        {
-            throw new RuntimeException( e );
-        }
     }
 }

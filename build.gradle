@@ -7,17 +7,24 @@ plugins {
 }
 
 repositories {
-    mavenLocal()
     mavenCentral()
-    xp.enonicRepo()
+    xp.enonicRepo('dev')
 }
 
 dependencies {
     compileOnly "com.enonic.xp:script-api:${xpVersion}"
-    implementation 'com.google.guava:guava:23.0'
-    testImplementation 'junit:junit:4.13.2'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.19.0'
     testImplementation "com.enonic.xp:testing:${xpVersion}"
-    testImplementation "org.mockito:mockito-core:5.17.0"
+
+    testImplementation(platform("org.junit:junit-bom:5.12.2"))
+    testImplementation(platform("org.mockito:mockito-bom:5.17.0"))
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'org.mockito:mockito-junit-jupiter'
+}
+
+tasks.named('test', Test) {
+    useJUnitPlatform()
 }
 
 jacocoTestReport {

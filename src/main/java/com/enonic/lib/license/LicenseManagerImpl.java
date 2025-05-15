@@ -16,11 +16,15 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
@@ -32,6 +36,7 @@ import com.enonic.xp.context.ContextBuilder;
 import com.enonic.xp.data.PropertyTree;
 import com.enonic.xp.home.HomeDir;
 import com.enonic.xp.node.CreateNodeParams;
+import com.enonic.xp.node.DeleteNodeParams;
 import com.enonic.xp.node.Node;
 import com.enonic.xp.node.NodePath;
 import com.enonic.xp.node.NodeService;
@@ -53,6 +58,8 @@ import com.enonic.xp.security.auth.AuthenticationInfo;
 public final class LicenseManagerImpl
     implements LicenseManager
 {
+    private final static ObjectMapper MAPPER = new ObjectMapper().setSerializationInclusion( JsonInclude.Include.NON_NULL );
+
     private final static Logger LOG = LoggerFactory.getLogger( LicenseManagerImpl.class );
 
     static final int KEY_SIZE = 2048;
@@ -69,7 +76,7 @@ public final class LicenseManagerImpl
 
     private static final String INSTALLED_LICENSES = "licenses";
 
-    public static final NodePath INSTALLED_LICENSES_PATH = NodePath.create( NodePath.ROOT, INSTALLED_LICENSES ).build();
+    public static final NodePath INSTALLED_LICENSES_PATH = NodePath.create( NodePath.ROOT).addElement(  INSTALLED_LICENSES ).build();
 
     public static final String NODE_LICENSE_PROPERTY = "license";
 
@@ -79,20 +86,13 @@ public final class LicenseManagerImpl
 
     private ResourceService resourceService;
 
-    private ApplicationKey currentApp;
+    private final ApplicationKey currentApp;
 
     private final Cache<String, Optional<LicenseDetails>> appValidationCache;
 
-    public LicenseManagerImpl()
+    public LicenseManagerImpl( BundleContext context )
     {
-        try
-        {
-            currentApp = ApplicationKey.from( getClass() );
-        }
-        catch ( NullPointerException e )
-        {
-            currentApp = null;
-        }
+        this.currentApp = ApplicationKey.from( context.getBundle() );
         this.appValidationCache = CacheBuilder.newBuilder().maximumSize( 10 ).expireAfterWrite( 20, TimeUnit.SECONDS ).build();
     }
 
@@ -107,7 +107,16 @@ public final class LicenseManagerImpl
 
     public String generateLicense( final com.enonic.lib.license.PrivateKey privateKey, final LicenseDetails license )
     {
-        String licenseData = LicenseDetailsJSONConverter.serialize( license );
+        String result;
+        try
+        {
+            result = MAPPER.writeValueAsString( new LicenseDetailsJson( license ) );
+        }
+        catch ( JsonProcessingException e )
+        {
+            throw new IllegalArgumentException( "Cannot serialize license", e );
+        }
+        String licenseData = result;
         licenseData = Base64.getEncoder().withoutPadding().encodeToString( licenseData.getBytes( StandardCharsets.UTF_8 ) );
 
         final String signature = sign( licenseData, privateKey.getRsaKey() );
@@ -137,7 +146,8 @@ public final class LicenseManagerImpl
             final byte[] licenseDataBytes = Base64.getUrlDecoder().decode( licenseData );
             final String licenseDataJson = new String( licenseDataBytes, StandardCharsets.UTF_8 );
 
-            return LicenseDetailsJSONConverter.parse( licenseDataJson );
+            final LicenseDetailsJson licenseDetailsJson = MAPPER.readValue( licenseDataJson, LicenseDetailsJson.class );
+            return licenseDetailsJson.toLicense();
         }
         catch ( Exception e )
         {
@@ -274,8 +284,8 @@ public final class LicenseManagerImpl
 
     private void deleteLicense( final String appKey )
     {
-        final NodePath path = NodePath.create( INSTALLED_LICENSES_PATH, appKey ).build();
-        nodeService.deleteByPath( path );
+        final NodePath path = NodePath.create( INSTALLED_LICENSES_PATH).addElement( appKey ).build();
+        nodeService.delete( DeleteNodeParams.create().nodePath( path ).build() );
     }
 
     private void storeLicense( final String license, final String appKey )
@@ -283,7 +293,7 @@ public final class LicenseManagerImpl
         PropertyTree data = new PropertyTree();
         data.setString( NODE_LICENSE_PROPERTY, license );
 
-        final NodePath path = NodePath.create( INSTALLED_LICENSES_PATH, appKey ).build();
+        final NodePath path = NodePath.create( INSTALLED_LICENSES_PATH).addElement( appKey ).build();
         if ( nodeService.nodeExists( path ) )
         {
             final UpdateNodeParams updateNode = UpdateNodeParams.create().
@@ -457,7 +467,7 @@ public final class LicenseManagerImpl
     {
         try
         {
-            final NodePath path = NodePath.create( INSTALLED_LICENSES_PATH, appKey ).build();
+            final NodePath path = NodePath.create( INSTALLED_LICENSES_PATH).addElement( appKey ).build();
             final Node licenseNode = nodeService.getByPath( path );
             if ( licenseNode == null )
             {
@@ -469,11 +479,6 @@ public final class LicenseManagerImpl
         {
             return null;
         }
-    }
-
-    public void setCurrentApp( final ApplicationKey currentApp )
-    {
-        this.currentApp = currentApp;
     }
 
     @Reference

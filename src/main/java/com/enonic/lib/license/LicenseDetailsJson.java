@@ -4,24 +4,17 @@ import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 final class LicenseDetailsJson
 {
-    @JsonProperty("issuedTo")
-    private String issuedTo;
+    public String issuedTo;
 
-    @JsonProperty("issuedBy")
-    private String issuedBy;
+    public String issuedBy;
 
-    @JsonProperty("issueTime")
-    private String issueTime;
+    public String issueTime;
 
-    @JsonProperty("expiryTime")
-    private String expiryTime;
+    public String expiryTime;
 
-    @JsonProperty("properties")
-    private Map<String, String> properties;
+    public Map<String, String> properties;
 
     @SuppressWarnings("unused")
     public LicenseDetailsJson()
@@ -39,13 +32,13 @@ final class LicenseDetailsJson
 
     public LicenseDetails toLicense()
     {
-        return LicenseDetails.create().
-            issuedTo( this.issuedTo ).
-            issuedBy( this.issuedBy ).
-            expiryTime( stringToInstant( this.expiryTime ) ).
-            issueTime( stringToInstant( this.issueTime ) ).
-            properties( this.properties ).
-            build();
+        return LicenseDetails.create()
+            .issuedTo( this.issuedTo )
+            .issuedBy( this.issuedBy )
+            .expiryTime( stringToInstant( this.expiryTime ) )
+            .issueTime( stringToInstant( this.issueTime ) )
+            .properties( this.properties )
+            .build();
     }
 
     private String instantToString( final Instant instant )
