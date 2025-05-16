@@ -14,8 +14,8 @@ repositories {
 dependencies {
     compileOnly "com.enonic.xp:script-api:${xpVersion}"
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.19.0'
-    testImplementation "com.enonic.xp:testing:${xpVersion}"
 
+    testImplementation "com.enonic.xp:testing:${xpVersion}"
     testImplementation(platform("org.junit:junit-bom:5.12.2"))
     testImplementation(platform("org.mockito:mockito-bom:5.17.0"))
     testImplementation 'org.junit.jupiter:junit-jupiter'
@@ -36,6 +36,3 @@ jacocoTestReport {
 
 check.dependsOn jacocoTestReport
 
-artifacts {
-    archives jar
-}

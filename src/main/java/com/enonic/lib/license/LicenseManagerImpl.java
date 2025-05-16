@@ -17,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
@@ -90,7 +91,8 @@ public final class LicenseManagerImpl
 
     private final Cache<String, Optional<LicenseDetails>> appValidationCache;
 
-    public LicenseManagerImpl( BundleContext context )
+    @Activate
+    public LicenseManagerImpl( final BundleContext context )
     {
         this.currentApp = ApplicationKey.from( context.getBundle() );
         this.appValidationCache = CacheBuilder.newBuilder().maximumSize( 10 ).expireAfterWrite( 20, TimeUnit.SECONDS ).build();
@@ -482,7 +484,7 @@ public final class LicenseManagerImpl
     }
 
     @Reference
-    public void setNodeService( final NodeService nodeService )
+    public void setNodeService(  )
     {
         this.nodeService = nodeService;
     }
