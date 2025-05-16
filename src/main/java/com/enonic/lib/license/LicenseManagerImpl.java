@@ -484,7 +484,7 @@ public final class LicenseManagerImpl
     }
 
     @Reference
-    public void setNodeService(  )
+    public void setNodeService( final NodeService nodeService )
     {
         this.nodeService = nodeService;
     }
