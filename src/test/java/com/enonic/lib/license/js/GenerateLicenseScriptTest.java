@@ -23,7 +23,7 @@ public class GenerateLicenseScriptTest
 
         BundleContext bundleContext = mock( BundleContext.class );
         Bundle bundle = mock( Bundle.class );
-        when( bundleContext.getBundle() ).thenReturn( null );
+        when( bundleContext.getBundle() ).thenReturn( bundle );
         when( bundle.getSymbolicName() ).thenReturn( "com.enonic.myapp" );
         final LicenseManagerImpl licenseManager = new LicenseManagerImpl( bundleContext );
 
