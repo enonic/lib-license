@@ -1,17 +1,12 @@
 package com.enonic.lib.license.js;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-
-import org.junit.After;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.io.TempDir;
-import org.mockito.Answers;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.osgi.framework.Bundle;
@@ -19,14 +14,14 @@ import org.osgi.framework.BundleContext;
 
 import com.enonic.lib.license.LicenseManager;
 import com.enonic.lib.license.LicenseManagerImpl;
-import com.enonic.xp.app.ApplicationKey;
 import com.enonic.xp.node.NodeService;
 import com.enonic.xp.resource.Resource;
 import com.enonic.xp.resource.ResourceKey;
 import com.enonic.xp.resource.ResourceService;
 import com.enonic.xp.testing.ScriptRunnerSupport;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class ValidateLicenseScriptTest
     extends ScriptRunnerSupport
@@ -75,7 +70,6 @@ public class ValidateLicenseScriptTest
         licenseManager.setNodeService( nodeService );
         Mockito.when( resourceService.getResource( Mockito.any() ) ).then( this::getResource );
     }
-
 
 
     @Override
