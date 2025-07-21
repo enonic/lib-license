@@ -19,7 +19,7 @@ repositories {
 
 dependencies {
     compileOnly "com.enonic.xp:script-api:${xpVersion}"
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.19.1'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.19.2'
 
     testImplementation "com.enonic.xp:testing:${xpVersion}"
     testImplementation(platform("org.junit:junit-bom:5.13.3"))
