@@ -94,7 +94,7 @@ public final class LicenseManagerImpl
     @Activate
     public LicenseManagerImpl( final BundleContext context )
     {
-        this.currentApp = ApplicationKey.from( context.getBundle() );
+        this.currentApp = ApplicationKey.from( context.getBundle().getSymbolicName() );
         this.appValidationCache = CacheBuilder.newBuilder().maximumSize( 10 ).expireAfterWrite( 20, TimeUnit.SECONDS ).build();
     }
 
