@@ -75,7 +75,7 @@ public final class InstallLicense
         final Context ctx = ContextBuilder.from( currentCtx ).
             repositoryId( LicenseManagerImpl.REPO_ID ).
             branch( Branch.from( "master" ) ).
-            authInfo( AuthenticationInfo.create().principals( RoleKeys.ADMIN ).user( User.ANONYMOUS ).build() ).
+            authInfo( AuthenticationInfo.create().principals( RoleKeys.ADMIN ).user( User.anonymous() ).build() ).
             build();
 
         ctx.runWith( () -> {

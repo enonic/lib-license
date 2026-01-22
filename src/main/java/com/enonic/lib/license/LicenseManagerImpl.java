@@ -235,7 +235,7 @@ public final class LicenseManagerImpl
         final Context ctxSudo = ContextBuilder.from( currentCtx ).
             repositoryId( REPO_ID ).
             branch( Branch.from( "master" ) ).
-            authInfo( AuthenticationInfo.create().principals( RoleKeys.ADMIN ).user( User.ANONYMOUS ).build() ).
+            authInfo( AuthenticationInfo.create().principals( RoleKeys.ADMIN ).user( User.anonymous() ).build() ).
             build();
 
         if ( !ctxSudo.callWith( this::initializeRepo ) )
@@ -272,7 +272,7 @@ public final class LicenseManagerImpl
         final Context ctx = ContextBuilder.from( currentCtx ).
             repositoryId( REPO_ID ).
             branch( Branch.from( "master" ) ).
-            authInfo( AuthenticationInfo.create().principals( RoleKeys.ADMIN ).user( User.ANONYMOUS ).build() ).
+            authInfo( AuthenticationInfo.create().principals( RoleKeys.ADMIN ).user( User.anonymous() ).build() ).
             build();
 
         ctx.runWith( () -> {
@@ -460,7 +460,7 @@ public final class LicenseManagerImpl
         final Context ctxRepo = ContextBuilder.from( ContextAccessor.current() ).
             repositoryId( REPO_ID ).
             branch( Branch.from( "master" ) ).
-            authInfo( AuthenticationInfo.create().principals( RoleKeys.ADMIN ).user( User.ANONYMOUS ).build() ).
+            authInfo( AuthenticationInfo.create().principals( RoleKeys.ADMIN ).user( User.anonymous() ).build() ).
             build();
         return ctxRepo.callWith( () -> loadLicense( appKey ) );
     }

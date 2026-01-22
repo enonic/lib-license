@@ -214,7 +214,7 @@ public class LicenseManagerImplTest
         final String license = licMan.generateLicense( keyPair.getPrivateKey(), licenseDetails );
 
         final Context ctxAuthenticated = ContextBuilder.from( ContextAccessor.current() ).
-            authInfo( AuthenticationInfo.create().principals( RoleKeys.AUTHENTICATED ).user( User.ANONYMOUS ).build() ).
+            authInfo( AuthenticationInfo.create().principals( RoleKeys.AUTHENTICATED ).user( User.anonymous() ).build() ).
             build();
 
         final boolean installed =
@@ -263,7 +263,7 @@ public class LicenseManagerImplTest
         final String license = licMan.generateLicense( keyPair.getPrivateKey(), licenseDetails );
 
         final Context ctxAuthenticated = ContextBuilder.from( ContextAccessor.current() ).
-            authInfo( AuthenticationInfo.create().principals( RoleKeys.AUTHENTICATED ).user( User.ANONYMOUS ).build() ).
+            authInfo( AuthenticationInfo.create().principals( RoleKeys.AUTHENTICATED ).user( User.anonymous() ).build() ).
             build();
 
         final boolean installed =
@@ -287,7 +287,7 @@ public class LicenseManagerImplTest
         when( repoService.isInitialized( any( RepositoryId.class ) ) ).thenReturn( true );
 
         final Context ctxAuthenticated = ContextBuilder.from( ContextAccessor.current() ).
-            authInfo( AuthenticationInfo.create().principals( RoleKeys.AUTHENTICATED ).user( User.ANONYMOUS ).build() ).
+            authInfo( AuthenticationInfo.create().principals( RoleKeys.AUTHENTICATED ).user( User.anonymous() ).build() ).
             build();
 
         final boolean uninstalled = ctxAuthenticated.callWith( () -> licMan.uninstallLicense( "com.enonic.myapp" ) );
