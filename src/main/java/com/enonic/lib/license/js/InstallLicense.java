@@ -79,7 +79,7 @@ public final class InstallLicense
             build();
 
         ctx.runWith( () -> {
-            if ( repositoryService.isInitialized( LicenseManagerImpl.REPO_ID ) )
+            if ( repositoryService.get( LicenseManagerImpl.REPO_ID ) != null )
             {
                 deleteLicense();
             }

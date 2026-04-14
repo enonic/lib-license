@@ -284,7 +284,7 @@ public class LicenseManagerImplTest
         licMan.setRepositoryService( repoService );
         licMan.setNodeService( nodeService );
 
-        when( repoService.isInitialized( any( RepositoryId.class ) ) ).thenReturn( true );
+        when( repoService.get( any( RepositoryId.class ) ) ).thenReturn( mock() );
 
         final Context ctxAuthenticated = ContextBuilder.from( ContextAccessor.current() ).
             authInfo( AuthenticationInfo.create().principals( RoleKeys.AUTHENTICATED ).user( User.anonymous() ).build() ).
