@@ -276,7 +276,7 @@ public final class LicenseManagerImpl
             build();
 
         ctx.runWith( () -> {
-            if ( repositoryService.isInitialized( REPO_ID ) )
+            if ( repositoryService.get( REPO_ID ) != null )
             {
                 deleteLicense( appKey );
             }
@@ -317,7 +317,7 @@ public final class LicenseManagerImpl
 
     private boolean initializeRepo()
     {
-        if ( !repositoryService.isInitialized( REPO_ID ) )
+        if ( repositoryService.get( REPO_ID ) == null )
         {
             final AccessControlList acl = AccessControlList.create().
                 add( AccessControlEntry.create().
@@ -500,4 +500,5 @@ public final class LicenseManagerImpl
     {
         this.repositoryService = repositoryService;
     }
+
 }
