@@ -19,14 +19,14 @@ repositories {
 
 dependencies {
     compileOnly "com.enonic.xp:script-api:${xpVersion}"
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.21.3'
+    implementation libs.jackson.databind
 
     testImplementation "com.enonic.xp:testing:${xpVersion}"
-    testImplementation(platform("org.junit:junit-bom:6.0.3"))
-    testImplementation(platform("org.mockito:mockito-bom:5.23.0"))
-    testImplementation 'org.junit.jupiter:junit-jupiter'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    testImplementation 'org.mockito:mockito-junit-jupiter'
+    testImplementation(platform(libs.junit.bom))
+    testImplementation(platform(libs.mockito.bom))
+    testImplementation libs.junit.jupiter
+    testRuntimeOnly libs.junit.platform.launcher
+    testImplementation libs.mockito.junit.jupiter
 }
 
 tasks.named('test', Test) {
