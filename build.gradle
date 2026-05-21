@@ -3,13 +3,7 @@ plugins {
     id 'jacoco'
     id 'maven-publish'
     id 'com.enonic.defaults' version '2.1.6'
-    id 'com.enonic.xp.base' version '3.6.2'
-}
-
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(25)
-    }
+    id 'com.enonic.xp.base'
 }
 
 repositories {
@@ -18,7 +12,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly "com.enonic.xp:script-api:${xpVersion}"
+    compileOnly xplibs.api.script
     implementation libs.jackson.databind
 
     testImplementation "com.enonic.xp:testing:${xpVersion}"
