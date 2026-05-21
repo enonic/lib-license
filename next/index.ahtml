@@ -598,7 +598,7 @@ The only thing that could be done to invalidate an installed license is to gener
 <div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-groovy" data-lang="groovy">dependencies {
-  include 'com.enonic.lib:lib-license:3.1.0'
+  include 'com.enonic.lib:lib-license:4.0.0'
 }</code></pre>
 </div>
 </div>
@@ -977,7 +977,7 @@ It is possible for a group of apps to use the same license, they just need to pa
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2026-05-21 19:02:18 UTC
+Last updated 2026-05-21 19:11:21 UTC
 </div>
 </div>
 </body>
