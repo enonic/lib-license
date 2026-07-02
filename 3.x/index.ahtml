@@ -471,6 +471,22 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 </div>
 <div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Versions 3.x target XP 7+.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
 <div class="sect1">
 <h2 id="licensemanager"><a class="link" href="#licensemanager">License Manager</a></h2>
 <div class="sectionbody">
@@ -598,7 +614,7 @@ The only thing that could be done to invalidate an installed license is to gener
 <div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-groovy" data-lang="groovy">dependencies {
-  include 'com.enonic.lib:lib-license:4.0.0'
+  include 'com.enonic.lib:lib-license:2.0.0'
 }</code></pre>
 </div>
 </div>
@@ -977,7 +993,7 @@ It is possible for a group of apps to use the same license, they just need to pa
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2026-07-02 06:34:44 UTC
+Last updated 2026-07-02 07:14:26 UTC
 </div>
 </div>
 </body>
