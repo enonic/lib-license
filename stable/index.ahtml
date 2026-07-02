@@ -471,6 +471,22 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 </div>
 <div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Versions 4.x target XP 8+.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
 <div class="sect1">
 <h2 id="licensemanager"><a class="link" href="#licensemanager">License Manager</a></h2>
 <div class="sectionbody">
@@ -977,7 +993,7 @@ It is possible for a group of apps to use the same license, they just need to pa
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2026-07-02 07:14:01 UTC
+Last updated 2026-07-02 07:14:21 UTC
 </div>
 </div>
 </body>
