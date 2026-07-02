@@ -1,5 +1,7 @@
 = Application Licensing
 
+NOTE: Versions 4.x target XP 8+.
+
 [[licensemanager]]
 == License Manager
 
